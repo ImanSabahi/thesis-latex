@@ -3,11 +3,24 @@ ADS PhD LaTeX template
 
 *This template is the result of an ongoing group effort by a number of
 volunteers. Help your fellow PhD researcher
-in the Issues section and contribute updates if you can. If you are fluent
-in TeX and can help monitoring this repository, ask Wannes Meert for admin rights.*
+in the Issues section and contribute updates via a pull request.*
 
 If you want to share tips, tricks, updates, questions or problems: add them
-as a [GitHub issue](https://github.com/wannesm/adsphd/issues) or a [GitHub pull request](https://help.github.com/articles/using-pull-requests).
+as a [GitHub issue](https://github.com/wannesm/adsphd/issues) or a 
+[GitHub pull request](https://help.github.com/articles/using-pull-requests).
+
+
+New 2024 cover design
+---------------------
+
+The template is updated to follow the new cover used by the different 
+doctoral schools (November 2024).
+
+There is a new (experimental) option `helveticaneue` to follow the new style
+that uses Helvetica Neue (otherwise Helvetica is used). If you activate this
+option, make sure to install the Helvetica Neue font and compile using
+`lualatex` or `xelatex`. These compilers have access to the fonts on your
+computers.
 
 
 Information
@@ -31,7 +44,8 @@ Directory structure
 The directory structure looks like this
 
 * `thesis.tex`: Main tex file for the final booklet.
-* `run.py`: Simple compilation script.
+* `adsphd.cls`, `adsphd.cfg`: The thesis class and configuration.
+* `run.py`: Simple compilation script (alternative to make).
 * `Makefile`
 * `Makefile.settings`: This file contains file names and other
                        settings used by make.
@@ -51,8 +65,8 @@ Using Latex directly
 The adsphd.cls class can be used directly by latex:
 
     pdflatex thesis
-    bibtex thesis
-    # biber thesis
+    bibtex thesis # if you use bibtex
+    # biber thesis # if you use biblatex
     makeindex thesis.glo -s thesis.ist -t thesis.glg -o thesis.gls
     makeindex thesis.nlo -s nomencl.ist -o thesis.nls
     pdflatex thesis
@@ -131,7 +145,7 @@ Options for the adsphd class
                               [fw]   Faculty of Science
                               [fa]   Faculty of Architecture
                               [fiiw] Faculty of Engineering Technology
-			      [hiw]  Institute of Philosophy
+                              [hiw]  Institute of Philosophy
 
     department            : department
                               [aow] Department of Earth and Environmental Sciences
@@ -225,9 +239,14 @@ Options for the adsphd class
     epub                  : use a small page size that works better on an
                             epub reader (e.g. Kindle)
 
-    covershowcommittee    : show the committee also on the cover.
     coverfontpercent=<int>: change the cover title font size. Should
                             be an integer number between 1 and 100.
+    helveticaneue         : Use the Helvetica Neue font instead of Helvetica.
+                            Helvetica Neueu is the font used by KU Leuven but
+                            requires LuaLaTeX or XeLaTex instead of pdflatex.
+    joint                 : Change the cover to the cover for a joint
+                            PhD dissertation.
+
 
 Most of the useful commands provided by this class can be found in the provided
 example file `thesis.tex`.
@@ -358,5 +377,7 @@ Jesper Cockx,
 Laurens Sion,
 Felipe Morales,
 Pieter Maene,
+Gianluca Scopelliti,
+Brent De Blaere,
 Roel Van Beeumen.
 

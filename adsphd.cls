@@ -1,5 +1,5 @@
 %%
-%% Copyright (C) 2009-2016 by KU Leuven
+%% Copyright (C) 2009-2025 by KU Leuven
 %%               Wannes Meert, Yves Frederix, Bart Vandewoestyne, ...
 %%
 %% This file may be distributed and/or modified under the
@@ -15,7 +15,7 @@
 %% 
 \NeedsTeXFormat{LaTeX2e}[2009/09/24]
 \ProvidesClass{adsphd}
-    [2016/05/30 v1.3 Standard KU Leuven Arenberg Doctoral School PhD class]
+    [2024/12/16 v2.0 Standard KU Leuven Arenberg Doctoral School PhD class]
 
 \newif\ifshellescape
 
@@ -38,13 +38,13 @@
 
 % Define bleed
 \newlength{\defaultlbleed}
-\setlength{\defaultlbleed}{3mm}
+\setlength{\defaultlbleed}{0mm}
 \newlength{\defaultrbleed}
-\setlength{\defaultrbleed}{3mm}
+\setlength{\defaultrbleed}{5mm}
 \newlength{\defaulttbleed}
-\setlength{\defaulttbleed}{3mm}
+\setlength{\defaulttbleed}{0mm}
 \newlength{\defaultbbleed}
-\setlength{\defaultbbleed}{3mm}
+\setlength{\defaultbbleed}{0mm}
 \newlength{\lbleed}
 \setlength{\lbleed}{0mm} % No bleed in normal mode
 \newlength{\rbleed}
@@ -130,6 +130,8 @@
 \DeclareBoolOption{colorlinks}
 
 % Cover options
+\DeclareBoolOption{helveticaneue}
+\DeclareBoolOption{joint}
 \DeclareStringOption{coverfontpercent}
 \DeclareBoolOption{covershowcommittee}
 \DeclareComplementaryOption{coverhidecommittee}{covershowcommittee}
@@ -174,6 +176,8 @@
   \DisableKeyvalOption[action=warning,package=adsphd]{adsphd}{phddegree}
   \DisableKeyvalOption[action=warning,package=adsphd]{adsphd}{bleed}
   \DisableKeyvalOption[action=warning,package=adsphd]{adsphd}{epub}
+  \DisableKeyvalOption[action=warning,package=adsphd]{adsphd}{helveticaneue}
+  \DisableKeyvalOption[action=warning,package=adsphd]{adsphd}{joint}
 
   \ifadsphd@nohyperref\else
     \hypersetup{%
@@ -449,11 +453,19 @@
 \gdef\@rev{}
 
 \def\copyyear#1{\gdef\@copyyear{#1}}
+\def\copyaddress#1{\gdef\@copyaddress{#1}}
 \def\researchgroup#1{\gdef\@researchgroup{#1}}
 \def\address#1{\gdef\@address{#1}}
 \def\addresscity#1{\gdef\@addresspc{#1}}
 \def\email#1{\gdef\@email{#1}}
 \def\website#1{\gdef\@website{#1}}
+\def\facultypartner#1{\gdef\@facultypartner{#1}}
+\def\departmentpartner#1{\gdef\@departmentpartner{#1}}
+\def\researchgrouppartner#1{\gdef\@researchgrouppartner{#1}}
+\def\addresspartner#1{\gdef\@addresspartner{#1}}
+\def\addresscitypartner#1{\gdef\@addresspcpartner{#1}}
+\def\emailpartner#1{\gdef\@emailpartner{#1}}
+\def\websitepartner#1{\gdef\@websitepartner{#1}}
 
 % doctoral school
 \ifx\@empty\adsphd@doctoralschool
@@ -505,9 +517,16 @@
 \title{Dissertation title ...}
 \subtitle{}
 \date{Month Year}
-\copyyear{2014}
+\copyyear{2024}
+\copyaddress{Leuven}
 \email{first.name@dept.kuleuven.be}
 \website{www.website.kuleuven.be}
+
+\researchgrouppartner{Research group partner...}
+\addresspartner{Address partner}
+\addresscitypartner{City partner}
+\emailpartner{first.name@partner.com}
+\websitepartner{www.partner.com}
 
 
 % Default filename for custom cover page
@@ -519,6 +538,8 @@
 % included tex file will be used!
 \newcommand{\prefname}{Preface}
 \newcommand{\prefnlname}{Dankwoord}
+\newcommand{\popabstname}{Popularized Abstract}
+\newcommand{\popabstnlname}{Gepopulariseerde Samenvatting}
 \newcommand{\abstname}{Abstract}
 \newcommand{\abstnlname}{Beknopte samenvatting}
 \newcommand{\tocname}{Contents}
@@ -606,6 +627,7 @@
 % TEXTPOS options
 \setlength{\TPHorizModule}{1mm}
 \setlength{\TPVertModule}{1mm}
+\TPMargin{0.0001mm}
 \ifadsphd@cover%
 \def\cleartextposbox{}%
 \else%
@@ -760,10 +782,27 @@
 \RequirePackage{rotating}
 
 % Helvetica font for the front cover
+\ifadsphd@helveticaneue
+\typeout{adsphd: Using Helvetica Neue, make sure to compile via
+LuaLaTeX or XeTeX}
+\RequirePackage{fontspec}
+\let\origsfdefault\sfdefault
+\newfontfamily\hnlcoverfont{HelveticaNeueLight}[BoldFont=HelveticaNeueMedium]
+\newfontfamily\hncoverfont{HelveticaNeue}[BoldFont=HelveticaNeueBold]
+\newcommand{\coverfont}{\hnlcoverfont}
+\newcommand{\coverfontlight}{\hnlcoverfont}
+\newcommand{\titlepagefont}{\sffamily}
+% Change font everywhere
+% \setsansfont[BoldFont=HelveticaNeue]{HelveticaNeueLight}
+\else
 \let\origsfdefault\sfdefault
 \RequirePackage[scaled]{helvet}
 \let\helvetsfdefault\sfdefault
 \renewcommand{\sfdefault}{\origsfdefault}
+\newcommand{\coverfont}{\sffamily}
+\newcommand{\coverfontlight}{\sffamily}
+\newcommand{\titlepagefont}{\sffamily}
+\fi
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % The document consists of 
@@ -877,14 +916,30 @@
   \fi
 }
 
+\newcommand{\includepopabstract}[1]{%
+  \IncludeUnnumberedChapterIfExists{#1}{\popabstname}{\instructionspopabstract}
+        {\phantomsection}
+}
+
+\newcommand{\includepopabstractnl}[1]{%
+  \selectlanguage{dutch}
+  \IncludeUnnumberedChapterIfExists{#1}{\popabstnlname}{\instructionspopabstract}
+        {\phantomsection}
+  \ifadsphd@british
+  \selectlanguage{british}
+  \else
+  \selectlanguage{english}
+  \fi
+}
+
 \newcommand{\includeabstract}[1]{%
-  \IncludeUnnumberedChapterIfExists{#1}{\abstractname}{\instructionsabstract}
+  \IncludeUnnumberedChapterIfExists{#1}{\abstname}{\instructionsabstract}
         {\phantomsection}
 }
 
 \newcommand{\includeabstractnl}[1]{%
   \selectlanguage{dutch}
-  \IncludeUnnumberedChapterIfExists{#1}{\abstractnlname}{\instructionsabstract}
+  \IncludeUnnumberedChapterIfExists{#1}{\abstnlname}{\instructionsabstract}
         {\phantomsection}
   \ifadsphd@british
   \selectlanguage{british}
@@ -936,7 +991,9 @@
   \cleardoublepage
   \phantomsection
   \addcontentsline{toc}{chapter}{\listfigurename}
+  \microtypesetup{protrusion=false}
   \listoffiguresorig
+  \microtypesetup{protrusion=true}
 }
 
 \let\listoftablesorig\listoftables
@@ -944,7 +1001,9 @@
   \cleardoublepage
   \phantomsection
   \addcontentsline{toc}{chapter}{\lotname}
+  \microtypesetup{protrusion=false}
   \listoftablesorig
+  \microtypesetup{protrusion=true}
 }
 
 \newcommand{\includeappendix}[1]{%
@@ -965,6 +1024,18 @@
         {\phantomsection}
 }
 
+\newcommand{\includegenai}{%
+\chapter*{Statement on the use of Generative AI}
+  \instructionsgenai
+  \ifthenelse{\equal{\theUseOfGenAI}{}}{}{%
+    \theUseOfGenAI\\
+  }
+  The text, code, and images in this thesis are my own (unless otherwise specified). Generative AI has
+  only been used in accordance with the KU~Leuven guidelines and appropriate references have been added.
+  I have reviewed and edited the content as needed and I take full responsibility for the content of
+  the thesis.
+}
+
 \newcommand{\includepublications}[1]{%
   \IncludeUnnumberedChapterIfExists{#1}{\pubname}%
         {\instructionslistofpublications}{\phantomsection}
@@ -983,7 +1054,7 @@
 \newenvironment{ftw_instructions}{
   \definecolor{shadecolor}{gray}{0.85}
   \begin{shaded}
-  \textbf{Instructies van de faculteit:} 
+  \textbf{Instructions by the Arenberg Doctoral School:} 
   
   }%
   {
@@ -993,16 +1064,25 @@
 \newcommand{\instructionspreface}{
   \ifadsphd@showinstructions
 \begin{ftw_instructions}
-In het voorwoord wordt de algemene doelstelling van het werk samengevat in
-enkele regels en worden personen, diensten of firma's bedankt voor hun
-medewerking bij het tot stand komen van het werk.
+Preface- Acknowledgements:
+The preface should summarise the general aim of the work. People,
+offices, companies and agencies who have awarded a doctoral
+scholarship (e.g., FWO, VLAIO, EC) should be thanked for their support.
+However, the names of these people, offices, companies and agencies
+may only be mentioned with their explicit consent and after
+consultation with the supervisor.
+\end{ftw_instructions}
+  \else
+  \fi
+}
 
-De naam van firma's en personen uit deze firma's mogen slechts worden vermeld
-mits hun uitdrukkelijke toelating \'en na overleg met de supervisor(en)!
-Steeds wordt de supervisor(en) vermeld, de verantwoordelijke en eventueel de
-personen die rechtstreeks geholpen hebben bv.\ door het ter beschikking stelling
-van meetresultaten, faciliteiten.  Ook de instantie die eventueel een
-doctoraatsbeurs heeft toegekend wordt bedankt (bv.\ FWO, IWT, \ldots).
+\newcommand{\instructionspopabstract}{
+  \ifadsphd@showinstructions
+\begin{ftw_instructions}
+The popularized abstract should be approximately 1 page long with
+contents and language that's suited to a wider circle of readers (not
+experts in your field). It should be easy to understand and enjoyable
+to read. Look at it as an advertisement for your PhD project. 
 \end{ftw_instructions}
   \else
   \fi
@@ -1011,10 +1091,8 @@ doctoraatsbeurs heeft toegekend wordt bedankt (bv.\ FWO, IWT, \ldots).
 \newcommand{\instructionsabstract}{
   \ifadsphd@showinstructions
 \begin{ftw_instructions}
-In een beknopte tekst van maximum 2 pagina's worden de belangrijkste
-doelstellingen en besluiten geformuleerd, zowel in het Nederlands als in het
-Engels.  Zulke samenvattingen kunnen worden gebruikt in wetenschappelijke
-verslagen van het departement of de faculteit.  Het Engels moet vlekkeloos zijn.
+The scientific abstract should present the most important aims and
+conclusions of the dissertation in a brief text of ca. 2 pages.
 \end{ftw_instructions}
   \else
   \fi
@@ -1035,9 +1113,9 @@ Nederlandse samenvatting draagt een Nederlandse titel.
 \newcommand{\instructionslistofsymbols}{
   \ifadsphd@showinstructions
 \begin{ftw_instructions}
-Lijst van gebruikte symbolen:
-omvat de lijst van de belangrijkste gebruikte symbolen met indices, betekenis
-en gebruikte eenheden.
+List of abbreviations and list of symbols:
+These are lists of the most important abbreviations and symbols used
+in the work, mentioning indices, meaning and measures used.
 \end{ftw_instructions}
   \else
   \fi
@@ -1046,8 +1124,12 @@ en gebruikte eenheden.
 \newcommand{\instructionstableofcontents}{
   \ifadsphd@showinstructions
 \begin{ftw_instructions}
-Inhoudstafel: de inhoudstafel omvat de titels van hoofdstukken en paragrafen
-met verwijzing naar de bladzijden.
+Table of contents: 
+The table of contents should be arranged neatly and must refer to the
+pages of the different sections (maximum three levels). Preceding
+chapter one, Roman numerals (I, II, \ldots) should be used for the page
+numbering. From chapter one onwards, Western Arabic numerals (1, 2,
+\ldots) should be used.
 \end{ftw_instructions}
   \else
   \fi
@@ -1056,10 +1138,10 @@ met verwijzing naar de bladzijden.
 \newcommand{\instructionsintroduction}{
   \ifadsphd@showinstructions
 \begin{ftw_instructions}
-De inleiding situeert de problematiek, beschrijft de stand van de huidige
-kennis terzake, omschrijft de voornaamste doelstelligen van het werk, samen
-met de beperkende randvoorwaarden en de ter beschikking gestelde middelen en
-poneert de belangrijkste stellingen.
+An in-depth introduction outlining the research in a broader context:
+Starting from a description of the state of the art in the domain,
+additionally, the research questions and objectives  are formulated.
+Furthermore, this includes the global approach and research methods.
 \end{ftw_instructions}
   \else
   \fi
@@ -1068,16 +1150,25 @@ poneert de belangrijkste stellingen.
 \newcommand{\instructionschapters}{
   \ifadsphd@showinstructions
 \begin{ftw_instructions}
-De hoofdstukken: Elk hoofdstuk is ingelast met een bepaald doel voor ogen.
-Dit doel wordt vermeld in de eerste paragraaf van elk hoofdstuk.
-Naargelang de aard van de tekst (experiment, uitvoering, theoretische
-ontwikkeling, \ldots) volgen de paragrafen elkaar op.  Beweringen worden altijd
-gestaafd, hetzij door eigen experimenten, hetzij door een theoretische
-afleiding, hetzij door verwijzingen naar de literatuur.
-Elk hoofdstuk eindigt met een kort samenvattend besluit waarbij nagegaan wordt
-in hoeverre de doelstelling van het betrokken hoofdstuk verwezenlijkt is.  De
-deelbesluiten moeten de lezer automatisch leiden naar het algemeen besluit aan
-het einde van het werk.
+Report and discussion of the research in different chapters:   These
+chapters, reporting and discussing research results, can be based on
+text that has already been published or accepted or submitted to
+journals or conferences. In that case, the bibliographic reference of
+the publication should be mentioned on the first page of the chapter.
+If there are multiple authors, the PhD researcher must clarify the own
+scientific contribution after that bibliographic reference on the
+first page of the chapter. There is no problem in editing or rewriting
+a text that has already been published or accepted for publication,
+for example to reach consistency and coherence in writing style and
+formatting, to add details that were left out from publication, to
+meet comments of the Examination Committee, etc;
+The doctoral candidate must determine whether the publisher allows
+public availability of the publications and in which form via the
+webpage Romeo/Sherpa.
+
+Consistency in layout is required for the entire manuscript!
+References to figures, tables, appendices, and similar structures need
+to be consistent.
 \end{ftw_instructions}
   \else
   \fi
@@ -1086,13 +1177,9 @@ het einde van het werk.
 \newcommand{\instructionsconclusions}{
   \ifadsphd@showinstructions
 \begin{ftw_instructions}
-Algemene besluiten:
-Verwijzend naar de inleiding en naar de besluiten van de afzonderlijke
-hoofdstukken worden op het einde van het proefschrift de voornaamste besluiten
-gebundeld.  Hier wordt de nadruk gelegd op de eigen inbreng, de verworven
-resultaten, de `stellingen' van het proefschrift en de originele bijdragen tot
-het onderzoeksdomein.  De onopgeloste problemen worden aangestipt en
-suggesties voor eventueel verder onderzoek worden gemaakt.
+An extensive conclusion, including a global discussion of the
+research results, a discussion of the implications of the PhD research
+and future perspectives in regards to follow-up research.
 \end{ftw_instructions}
   \else
   \fi
@@ -1101,8 +1188,15 @@ suggesties voor eventueel verder onderzoek worden gemaakt.
 \newcommand{\instructionsbibliography}{
   \ifadsphd@showinstructions
 \begin{ftw_instructions}
-De bibliografie.
-Departementale richtlijnen terzake te volgen.
+Bibliography:
+Should be arranged according to the guidelines generally accepted in
+the relevant research domain.
+
+The thesis needs to be consistent in relation to bibliographic and
+other references. Either a global list of bibliographic references is
+provided at the end of the thesis, or each chapter contains
+bibliographic references at the end, but there cannot be a combination
+of these two methods of referencing.
 \end{ftw_instructions}
   \else
   \fi
@@ -1111,7 +1205,10 @@ Departementale richtlijnen terzake te volgen.
 \newcommand{\instructionslistofpublications}{
   \ifadsphd@showinstructions
 \begin{ftw_instructions}
-Lijst van de publicaties door de doctorandus/a (auteur of co-auteur).
+List of scientific publications with a clear DOI (digital object
+identifier) number mentioned:(optional): The list of scientific
+publications by the doctoral researcher should be arranged according
+to the guidelines generally accepted in the relevant research domain.
 \end{ftw_instructions}
   \else
   \fi
@@ -1120,7 +1217,22 @@ Lijst van de publicaties door de doctorandus/a (auteur of co-auteur).
 \newcommand{\instructionscv}{
   \ifadsphd@showinstructions
 \begin{ftw_instructions}
-Beknopt CV van de doctorandus.
+Curriculum vitae: Short CV of the PhD candidate.
+\end{ftw_instructions}
+  \else
+  \fi
+}
+\newcommand{\instructionsgenai}{
+  \ifadsphd@showinstructions
+\begin{ftw_instructions}
+Read the guidelines in relation to GenAI at KU Leuven and add the `statement
+on the use of Generative AI' in your manuscript.
+
+\ifthenelse{\equal{\theUseOfGenAI}{}}{%
+  Uncomment the appropriate sentences in the \textbackslash useOfGenAI command
+  and expand the text where needed to make it more specific and add topics if they are not covered
+  by any of the indicated topics.
+}{}
 \end{ftw_instructions}
   \else
   \fi
@@ -1129,17 +1241,18 @@ Beknopt CV van de doctorandus.
 \newcommand{\instructionsappendices}{
   \ifadsphd@showinstructions
 \begin{ftw_instructions}
-De appendices:
-ze omvatten alle gedeelten uit de tekst die weliswaar essentieel zijn voor het
-proefschrift, maar waarvan de inlassing in de tekst de leesbaarheid ervan
-nadelig zouden be\"invloeden bv. omwille van hun lengte. Zo kunnen bv. de brute
-meetresultaten of een computerprogramma met zijn bron, commentaar en
-voorbeelden beter thuishoren in een appendix dan in de tekst zelf.
-De appendices kunnen desgevallend worden gebundeld in een apart boekdeel.
+Appendices: The appendices should include parts of the research
+which are essential for the work, but which may hamper the readability
+of the text, e.g. because of their length (mathematical deductions,
+experimental data, examples, figures, etc.).
 \end{ftw_instructions}
   \else
   \fi
 }
+
+\newcommand{\theUseOfGenAI}{}
+\newcommand{\useOfGenAI}[1]{\renewcommand{\theUseOfGenAI}{#1}}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%% New commands for the Dutch summary  %%%%%%%%%%%%%%%%%%%
 
@@ -1193,16 +1306,17 @@ De appendices kunnen desgevallend worden gebundeld in een apart boekdeel.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Define front and back cover + redefine the title page
+% Define front and back cover
 %
-% +-> For guidelines: http://set.kuleuven.be/phd/doc/guidelines_cover.pdf
+% For guidelines:
+% https://set.kuleuven.be/phd/researchers/template_kaft/guidelines_PhDthesis.htm
 
 \newcommand{\cropline}[4]{%
   \setlength{\unitlength}{1mm}
   \linethickness{.5pt}
   \setlength{\tmplength}{2mm}
   \setlength{\tmplength}{#3\tmplength}
-  \typeout{the tmplenght \the\tmplength}
+  % \typeout{the tmplenght \the\tmplength}
   \begin{textblock*}{0mm}(#1,#2+\tmplength)
   \ifthenelse{\equal{#3}{1}}{
     \begin{picture}(1,#4)(0,0)
@@ -1216,6 +1330,25 @@ De appendices kunnen desgevallend worden gebundeld in een apart boekdeel.
  \end{textblock*}
 }
 
+\newcommand{\croplineh}[4]{%
+  \setlength{\unitlength}{1mm}
+  \linethickness{.5pt}
+  \setlength{\tmplength}{2mm}
+  \setlength{\tmplength}{#3\tmplength}
+  % \typeout{the tmplenght \the\tmplength}
+  \begin{textblock*}{0mm}(#1+\tmplength,#2)%
+  \ifthenelse{\equal{#3}{1}}{
+    \begin{picture}(#4,1)(0,-1)
+      \put(0,0){\line(1,0){#4}}
+    \end{picture}
+  }{ % #3 == -1
+    \begin{picture}(-#4,1)(0,-1)
+      \put(0,0){\line(-1,0){#4}}
+    \end{picture}
+  }
+ \end{textblock*}
+}
+
 \newcommand{\useCustomCoverpageIfExists}{%
   \IfFileExists{\@customcoverpage}{%
     \typeout{adsphd.cls: Using custom cover page (\@customcoverpage)}
@@ -1223,11 +1356,8 @@ De appendices kunnen desgevallend worden gebundeld in een apart boekdeel.
   }{
     \typeout{adsphd.cls: Cannot find custom cover page 
       (\@customcoverpage). Restoring default cover page.}
-    \let\makefrontcovergeneralX\orig@makefrontcovergeneralX
-    \let\makebackcovergeneralX\orig@makebackcovergeneralX
-
-    \let\makefrontcovergeneralXII\orig@makefrontcovergeneralXII
-    \let\makebackcovergeneralXII\orig@makebackcovergeneralXII
+    \let\makefrontcovergeneral\orig@makefrontcovergeneral
+    \let\makebackcovergeneral\orig@makebackcovergeneral
   }
 }{}
 
@@ -1237,6 +1367,8 @@ De appendices kunnen desgevallend worden gebundeld in een apart boekdeel.
   % #2: spinetitlewidth
   \setlength{\lbleed}{\defaultlbleed}
   \setlength{\rbleed}{\defaultrbleed}
+  \setlength{\tbleed}{\defaulttbleed}
+  \setlength{\bbleed}{\defaultbbleed}
   \setlength{\adsphdspinewidth}{#1}
 
   \newlength{\skiplen}
@@ -1247,128 +1379,180 @@ De appendices kunnen desgevallend worden gebundeld in een apart boekdeel.
   %\end{textblock*}
 
   \setlength{\skiplen}{0mm+\rbleed}
-  \makebackcovergeneralXII{\skiplen}{0}
+  \makebackcovergeneralXXIV{\skiplen}{0}
 
   \setlength{\skiplen}{\lbleed+\rbleed+\adsphdpaperwidth}
-  \makespinegeneralXII{\skiplen}{0}{#1}{#2}
+  \makespinegeneralXXIV{\skiplen}{0}{#1}{#2}
 
   \setlength{\skiplen}{\rbleed+2\lbleed+\adsphdpaperwidth+\adsphdspinewidth}
-  \makefrontcovergeneralXII{\skiplen}{0}
+  \makefrontcovergeneralXXIV{\skiplen}{0}
 
+  \drawextracroplines
+}
+
+\newcommand{\drawextracroplines}{%
   % Draw some extra crop lines
+  % Croplines on top
   \cropline{\rbleed}{0mm}{-1}{5}
   \cropline{\rbleed+\adsphdpaperwidth}{0mm}{-1}{5}
   \cropline{\rbleed+\lbleed+\adsphdpaperwidth}{0mm}{-1}{10}
   \cropline{\rbleed+\lbleed+\adsphdpaperwidth+\adsphdspinewidth}{0mm}{-1}{10}
   \cropline{\rbleed+2\lbleed+\adsphdpaperwidth+\adsphdspinewidth}{0mm}{-1}{5}
   \cropline{\rbleed+2\lbleed+2\adsphdpaperwidth+\adsphdspinewidth}{0mm}{-1}{5}
-  \cropline{\rbleed}{\adsphdpaperheight}{1}{5}
-  \cropline{\rbleed+\adsphdpaperwidth}{\adsphdpaperheight}{1}{5}
-  \cropline{\rbleed+\lbleed+\adsphdpaperwidth}{\adsphdpaperheight}{1}{10}
-  \cropline{\rbleed+\lbleed+\adsphdpaperwidth+\adsphdspinewidth}{\adsphdpaperheight}{1}{10}
-  \cropline{\rbleed+2\lbleed+\adsphdpaperwidth+\adsphdspinewidth}{\adsphdpaperheight}{1}{5}
-  \cropline{\rbleed+2\lbleed+2\adsphdpaperwidth+\adsphdspinewidth}{\adsphdpaperheight}{1}{5}
+  % Croplines on bottom
+  \cropline{\rbleed}{\adsphdpaperheight+\defaulttbleed+\defaultbbleed}{1}{5}
+  \cropline{\rbleed+\adsphdpaperwidth}{\adsphdpaperheight+\defaulttbleed+\defaultbbleed}{1}{5}
+  \cropline{\rbleed+\lbleed+\adsphdpaperwidth}{\adsphdpaperheight+\defaulttbleed+\defaultbbleed}{1}{10}
+  \cropline{\rbleed+\lbleed+\adsphdpaperwidth+\adsphdspinewidth}{\adsphdpaperheight+\defaulttbleed+\defaultbbleed}{1}{10}
+  \cropline{\rbleed+2\lbleed+\adsphdpaperwidth+\adsphdspinewidth}{\adsphdpaperheight+\defaulttbleed+\defaultbbleed}{1}{5}
+  \cropline{\rbleed+2\lbleed+2\adsphdpaperwidth+\adsphdspinewidth}{\adsphdpaperheight+\defaulttbleed+\defaultbbleed}{1}{5}
+  % Croplines on left
+  \croplineh{0mm}{\tbleed}{-1}{5}
+  \croplineh{0mm}{\tbleed+\adsphdpaperheight}{-1}{5}
+  % Croplines on right
+  \croplineh{2\rbleed+2\lbleed+2\adsphdpaperwidth+\adsphdspinewidth}{\tbleed}{1}{5}
+  \croplineh{2\rbleed+2\lbleed+2\adsphdpaperwidth+\adsphdspinewidth}{\tbleed+\adsphdpaperheight}{1}{5}
 
 }
 
+\newcommand{\drawextracroplinesexplanation}{%
+  \@ifpackageloaded{tikz}{%
+  \begin{textblock*}{2cm}(\rbleed+2\lbleed+2\adsphdpaperwidth+\adsphdspinewidth-2cm,0mm)
+    \textblockcolour{}%
+    \resizebox{2cm}{!}{%
+    \begin{tikzpicture}
+      \draw[->] (0,0) to[bend right] (0.5,1);
+      \node[anchor=east] at (0,0) {cropmark(R)};
+    \end{tikzpicture}%
+    }%
+  \end{textblock*}
+  \begin{textblock*}{4cm}(\rbleed+2\lbleed+\adsphdpaperwidth+\adsphdspinewidth,0mm)
+    \textblockcolour{}%
+    \resizebox{4cm}{!}{%
+    \begin{tikzpicture}
+      \draw[->] (0.5,0) to[bend left] (0,1);
+      \node[anchor=west] at (0.5,0) {cropmark(L) / spine fold line};
+    \end{tikzpicture}%
+    }%
+  \end{textblock*}
+  }{%
+    \typeout{Tikz not found}
+  }
+}
+
+\let\makefrontcover\makefrontcoverXXIV
+\let\makebackcover\makebackcoverXXIV
+
+\newcommand{\coverfontsize}[2]{%
+  \count1=#1
+  \count2=#2
+  %\expandafter\message{COVERFONTSIZE: #1 #2 \adsphd@coverfontpercent}
+  \multiply \count1 by \adsphd@coverfontpercent
+  \divide \count1 by 100
+  \multiply \count2 by \adsphd@coverfontpercent
+  \divide \count2 by 100
+  %\expandafter\message{COVERFONTSIZE: #1 #2 \the\count1\ \the\count2}
+  \fontsize{\the\count1}{\the\count2}
+}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Provide front cover using the 2012 (XII) layout
+% Provide front cover using the 2024 (XXIV) layout
 % used by the Arenberg Doctoral School
-\newcommand{\frontcoverheaderXII}[1]{%
-  % Use Helvetica
-  \renewcommand{\sfdefault}{\helvetsfdefault}
+%
+% Huisstijl is followed with:
+% Logo: X=20mm, Y=56mm
+% X/2=10mm, a=2mm, b=6m
+% Pagesize: Publicaties >=A5 <A3
+% Bar on top: X/2+a+b = 18mm
+% Logo wrt side: X/2 = 10mm
+% Text wrt side: X/2+b = 16mm
+% Text wrt bottom: X/2+b = 16mm
+\newcommand{\frontcoverheaderXXIV}[1]{%
   \thispagestyle{empty}
   % Blue bar on top
-  \begin{textblock*}{\adsphdpaperwidth+\lbleed+\rbleed}(0mm-\lbleed+#1,20mm)
+  \begin{textblock*}{\adsphdpaperwidth+\lbleed+\rbleed}(0mm-\lbleed+#1,18mm+\tbleed)
   \textblockcolour{kulprimaryblue}
   %\vspace{-\parskip}
-  \rule{0pt}{20mm}
+  \rule{0pt}{34mm}
   \end{textblock*}
   %
   % Create logo box
-  \begin{textblock*}{56mm}(10mm+#1,15mm)
+  \begin{textblock*}{56mm}(10mm+#1,10mm+\tbleed)
   % explicitly turn off block colour to prevent the coloured background from popping up due to misalignment of the logo
   \textblockcolour{}
   \includegraphics[width=56mm,height=20mm]{image/KULEUVEN_LOGO_2012}
   \end{textblock*}
   %
   % Create ADS+faculty box
-  \begin{textblock*}{85mm}(70mm+#1,20mm)
+  \begin{textblock*}{85mm}(16mm+#1,35mm+\tbleed)
   \textblockcolour{}
-  \vspace{-\parskip}
-  %\hspace*{2mm}
-  \begin{flushright}
-  \fontsize{12}{15}\selectfont
+  \coverfont
+  \raggedright
+  \fontsize{10}{11}\selectfont%
   \def\tmphss{hss}%
   \ifx\tmphss\adsphd@doctoralschool
   \typeout{adsphd: Cover, smaller font size to fit doctoral school name}
-  \fontsize{10}{13}\selectfont%
+  \fontsize{10}{11}\selectfont%
   \fi
-  {\bfseries \textcolor{white} {\sffamily \expandafter\MakeUppercase\expandafter{\@doctoralschool}}}\\[.2mm]
-  {\sffamily \textcolor{white} {\@faculty}}
-  \end{flushright}
+  {\textcolor{white} 
+  {\textbf{\expandafter\MakeUppercase\expandafter\@doctoralschool}\\[.2mm]
+   \@faculty}}
   \end{textblock*}
 }
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Provide front cover using the 2010 (X) layout
-% used by the Arenberg Doctoral School
-\newcommand{\frontcoverheaderX}[1]{%
-  % Use Helvetica
-  \renewcommand{\sfdefault}{\helvetsfdefault}
+\newcommand{\frontcoverheaderXXIVjoint}[1]{%
   \thispagestyle{empty}
-  % Now using \usepackage[absolute]{textpos}. The positioning become a lot
-  % robuster this way wrt changes in margins etc.
-  %
-  % Put sedes at top center
-  \begin{textblock*}{\adsphdpaperwidth}(0mm+#1,0mm)
-  \textblockcolour{}
-  \vspace{-\parskip}
-  \begin{center}
-  \includegraphics[width=8mm]{image/sedes}
-  \end{center}
-  \end{textblock*}
-  %
-  % Create gray box
-  \begin{textblock*}{100mm+\rbleed}(60mm+#1,20mm)
-  \textblockcolour{gray}
-  \vspace{-\parskip}
-  \hspace*{2mm}
-  \parbox[c][20mm]{97.92mm}{
-  {\bfseries \small \textcolor{white} {\sffamily Arenberg Doctoral School of Science, Engineering \& Technology}}\\[.2mm]
-  {\sffamily\small \textcolor{white} {\@faculty}}\\[.2mm]
-  {\sffamily\small \textcolor{white} {\@department}}
-  }
-  \end{textblock*}
-  %
-  % Create blue background 
-  \begin{textblock*}{60mm+\lbleed}(0mm-\lbleed+#1, 20mm)
-  \textblockcolour{}
-  \includegraphics[width=60mm+\lbleed,height=20mm]{image/blue}
-  \end{textblock*}
-  %
-  % Put KULeuven logo on top of the blue background
-  \begin{textblock*}{60mm}(0mm+#1, 20mm)
-  \textblockcolour{}
+  % Use Helvetica
+  \ifadsphd@helveticaneue
+  \else
+  \renewcommand{\sfdefault}{\helvetsfdefault}
+  \fi
+  % Blue bar on top
+  \begin{textblock*}{\adsphdpaperwidth+\lbleed+\rbleed}(0mm-\lbleed+#1,0mm)
+  \textblockcolour{kulprimaryblue}
   %\vspace{-\parskip}
-  \includegraphics*[height=20mm]{image/kullogo2}
+  \rule{0pt}{18mm+\tbleed}
+  \end{textblock*}
+  %
+  % Blue bar below logos
+  \begin{textblock*}{\adsphdpaperwidth+\lbleed+\rbleed}(0mm-\lbleed+#1,38mm+\tbleed)
+  \textblockcolour{kulprimaryblue}
+  %\vspace{-\parskip}
+  \rule{0pt}{18mm}
+  \end{textblock*}
+  %
+  % Create logo box KU Leuven
+  \begin{textblock*}{34mm}(16mm+#1,21mm+\tbleed)
+  % explicitly turn off block colour to prevent the coloured background from popping up due to misalignment of the logo
+  \textblockcolour{}
+  \includegraphics[width=34mm,height=12mm]{image/KULEUVEN_LOGO_2012}
+  \end{textblock*}
+  %
+  % Create logo box partner university
+  \begin{textblock*}{34mm}(\adsphdpaperwidth+#1-34mm-16mm,21mm+\tbleed)
+  % explicitly turn off block colour to prevent the coloured background from popping up due to misalignment of the logo
+  \textblockcolour{}
+  \includegraphics[width=34mm,height=12mm]{image/PARTNER_LOGO}
+  \end{textblock*}
+  %
+  % Create ADS + faculty box KU Leuven
+  \begin{textblock*}{85mm}(16mm+#1,43mm+\tbleed)
+  \textblockcolour{}
+  \coverfont
+  \raggedright
+  \fontsize{10}{11}\selectfont%
+  \def\tmphss{hss}%
+  \ifx\tmphss\adsphd@doctoralschool
+  \typeout{adsphd: Cover, smaller font size to fit doctoral school name}
+  \fontsize{10}{11}\selectfont%
+  \fi
+  {\textcolor{white} 
+  {\textbf{\expandafter\MakeUppercase\expandafter\@doctoralschool}\\[.2mm]
+   \@faculty}}
   \end{textblock*}
 }
 
-\newcommand{\frontcoverfooterX}[1]{%
-  % Only add empty pages if asked for
-  \ifthenelse{\equal{#1}{1}}
-  {
-    \newpage
-    \thispagestyle{empty} \mbox{}
-    \newpage
-  }{}
-  %
-  % Restore font
-  \renewcommand{\sfdefault}{\origsfdefault}
-}
-
-\newcommand{\frontcoverfooterXII}[1]{%
+\newcommand{\frontcoverfooterXXIV}[1]{%
   % Only add empty pages if asked for
   \ifthenelse{\equal{#1}{1}}
   {
@@ -1384,27 +1568,27 @@ De appendices kunnen desgevallend worden gebundeld in een apart boekdeel.
   \cleartextposbox
 }
 
-\newcommand{\coverfontsize}[2]{%
-  \count1=#1
-  \count2=#2
-  %\expandafter\message{COVERFONTSIZE: #1 #2 \adsphd@coverfontpercent}
-  \multiply \count1 by \adsphd@coverfontpercent
-  \divide \count1 by 100
-  \multiply \count2 by \adsphd@coverfontpercent
-  \divide \count2 by 100
-  %\expandafter\message{COVERFONTSIZE: #1 #2 \the\count1\ \the\count2}
-  \fontsize{\the\count1}{\the\count2}
-}
-
-\newcommand{\makefrontcoverXII}{\makefrontcovergeneralXII{0mm}{1}}
+\newcommand{\makefrontcoverXXIV}{\makefrontcovergeneralXXIV{0mm}{1}}
 \ifadsphd@epub
-  \renewcommand{\makefrontcoverXII}{}
+  % The cover uses absolute positioning and does not scale automatically
+  % to smaller page sizes, thus leave out
+  \renewcommand{\makefrontcoverXXIV}{}
 \fi
-\newcommand{\makefrontcovergeneralXII}[2]{%
-  \typeout{adsphd.cls: Create cover with bleed (\the\rbleed,\the\lbleed)}
+\newcommand{\makefrontcovergeneralXXIV}[2]{%
+  \typeout{adsphd.cls: Create cover using bleed = (\the\rbleed,\the\lbleed,\the\tbleed,\the\bbleed)}
+  % Use Helvetica
+  \ifadsphd@helveticaneue
+  \coverfont
+  \else
+  \renewcommand{\sfdefault}{\helvetsfdefault}
+  \fi
   %
   % Create header
-  \frontcoverheaderXII{#1}
+  \ifadsphd@joint
+  \frontcoverheaderXXIVjoint{#1}
+  \else
+  \frontcoverheaderXXIV{#1}
+  \fi
   %
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
   %
@@ -1421,14 +1605,13 @@ De appendices kunnen desgevallend worden gebundeld in een apart boekdeel.
   %
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
   %
-  % Place the DRAFT notifier on the front page to avoid printing a wrong
-  % version
+  % Put a DRAFT notifier on the front page to avoid printing a wrong version
   \ifadsphd@final\else
-    \begin{textblock*}{120mm}(17.5mm+#1,50mm)
+    \begin{textblock*}{120mm}(17.5mm+#1,120mm+\tbleed)
     \textblockcolour{}
     \vspace{-\parskip}
     \begin{center}
-        \selectfont\LARGE\sffamily\textbf{\color{red}{
+        \selectfont\LARGE\coverfont\textbf{\color{red}{
             DRAFT\\
             {\small To remove, add `final' to class options}
         }}
@@ -1437,213 +1620,67 @@ De appendices kunnen desgevallend worden gebundeld in een apart boekdeel.
   \fi
   %
   % Place the title and subtitle
-  %\typeout{Title position: 17.5mm+\the#1}
-  \begin{textblock*}{135mm}(17.5mm+#1,100mm)
+  \begin{textblock*}{135mm}(16mm+#1,77mm+\tbleed)
   \textblockcolour{}
   \vspace{-\parskip}
   \raggedright
-  \coverfontsize{30}{34}\selectfont\sffamily{\color{kulprimaryblue}\@title}\\
-  \coverfontsize{20}{25}\selectfont\sffamily{\@subtitle}
+  \coverfontsize{32}{38}\selectfont\coverfontlight{\color{kulprimaryblue}\@title}\\[1ex]
+  \coverfontsize{20}{25}\selectfont\coverfontlight{\@subtitle}
   \end{textblock*}
   %
-  % Place the author name
-  \begin{textblock*}{135mm}(17.5mm+#1,170mm)
-  \textblockcolour{}
-  \vspace{-\parskip}
-  \begin{flushright}
-  \coverfontsize{14}{19}\selectfont\sffamily\textbf{\@authorf\ \@authorl}
-  \end{flushright}
-  \end{textblock*}
-  %
-  % Place the fullfilment text
-  \begin{textblock*}{67.5mm}(85mm+#1,185mm)
-  \textblockcolour{}
-  \vspace{-\parskip}
-  \begin{minipage}[t]{67mm}
-  {\coverfontsize{12}{15}\selectfont\sffamily%
-  \begin{flushright}
-  Dissertation presented in partial\\%
-  \fulfillment\ of the requirements for the\\%
-  degree of \@phddegree
-  \end{flushright}
-  }
-  \end{minipage}
-  \end{textblock*}
-  %
-  % Place the date text
-  \begin{textblock*}{67.5mm}(85mm+#1,220mm)
-  \textblockcolour{}
-  \vspace{-\parskip}
-  \begin{minipage}[t]{67mm}
-  \begin{flushright}
-  {\coverfontsize{12}{15}\selectfont\sffamily\@date}
-  \end{flushright}
-  \end{minipage}
-  \end{textblock*}
-  %
-  % Place the Examination committee text
-  \ifadsphd@covershowcommittee
-    \begin{textblock*}{67.5mm}(17.5mm+#1,185mm)
-    \textblockcolour{}
-    \vspace{-\parskip}
-    \begin{minipage}[t]{67mm}
-      \coverfontsize{12}{15}\selectfont\sffamily
-      %\begin{tabular}[t]{p{6.9cm}}
-      Examination committee:
-      \DTLforeach{president}{\name=name,\affiliation=affiliation}{%
-      \\\name, chair
-      \ifthenelse{\equal{\affiliation}{}}{}{%
-        \\\rule{0.5cm}{0pt}(\affiliation)
-      }}
-      \DTLforeach{supervisor}{\name=name,\affiliation=affiliation}{%
-      \\\name, supervisor
-      \ifthenelse{\equal{\affiliation}{}}{}{%
-        \\\rule{0.25cm}{0pt}(\affiliation)
-      }}
-      %\DTLforeach{cosupervisor}{\name=name,\affiliation=affiliation}{%
-      %\\\name%, co-supervisor
-      %\ifthenelse{\equal{\affiliation}{}}{}{%
-        %\\\rule{0.25cm}{0pt}(\affiliation)
-      %}}
-      \DTLforeach{jury}{\name=name,\affiliation=affiliation}{%
-      \\\name
-      \ifthenelse{\equal{\affiliation}{}}{}{%
-        \\\rule{0.5cm}{0pt}(\affiliation)
-      }}
-      \DTLforeach{externaljury}{\name=name,\affiliation=affiliation}{%
-      \\\name
-      \\\rule{0.25cm}{0pt}(\affiliation)
-      }
-      \\
-      \if\empty\@udc \else U.D.C. \@udc\fi
-    %\end{tabular}
-    \end{minipage}
-    \end{textblock*}
-  \else
-    \begin{textblock*}{67.5mm}(17.5mm+#1,185mm)
-    \textblockcolour{}
-    \vspace{-\parskip}
-    \begin{minipage}[t]{67mm}
-      \coverfontsize{12}{15}\selectfont\sffamily
-      %\begin{tabular}[t]{p{6.9cm}}
+  \begin{textblock*}{160mm}(16mm+#1,174mm+\tbleed)  % {hsize}(hpos,vpos)
+    \textblockcolour{}%
+    \setlength{\fboxsep}{0pt}%
+    {%
+    \begin{minipage}[b][50mm][b]{60mm}
+      \fontsize{9}{11}\selectfont\coverfontlight
+      \ifadsphd@covershowcommittee
+        % NOT SUPPORTED
+        \typeout{ERROR: Show full committee on front page not supported}
+      \fi
       \dtlifnumlt{\DTLrowcount{supervisor}}{2}{Supervisor:}{Supervisors:}
       \DTLforeach{supervisor}{\name=name,\affiliation=affiliation}{%
-      \\\name
-      \ifthenelse{\equal{\affiliation}{}}{}{%
-        \\\rule{0.25cm}{0pt}(\affiliation)
+        \\\name
+        \ifthenelse{\equal{\affiliation}{}}{}{%
+          \\\rule{0.25cm}{0pt}(\affiliation)
       }}
+      % Deprecated: Everybody is supervisor
       %\DTLforeach{cosupervisor}{\name=name,\affiliation=affiliation}{%
       %\\\name%, co-supervisor
       %\ifthenelse{\equal{\affiliation}{}}{}{%
-        %\\\rule{0.25cm}{0pt}(\affiliation)
+      %\\\rule{0.25cm}{0pt}(\affiliation)
       %}}
-      \\
-      \if\empty\@udc \else U.D.C. \@udc\fi
-    %\end{tabular}
+      \if\empty\@udc \else \\U.D.C. \@udc\fi
     \end{minipage}
-    \end{textblock*}
-  \fi
-  %
-  % Bottom blue bar
-  \begin{textblock*}{\adsphdpaperwidth+\lbleed+\rbleed}(0mm-\lbleed+#1,234mm)
-  \textblockcolour{kullightblue}
-  %\vspace{-\parskip}
-  \rule{0pt}{2.1mm}
+    }
+  {%
+    \begin{minipage}[b][50mm][b]{60mm}
+      \textblockcolour{}
+      \begin{flushright}
+        {\fontsize{12}{14}\selectfont\coverfontlight\textbf{\@authorf\
+        \@authorl}}
+        \\[1em]
+        {\fontsize{9}{11}\selectfont\coverfontlight%
+          Dissertation presented in partial \fulfillment\\%
+          of the requirements for the degree of\\%
+          \@phddegree
+        }
+        \\[1em]
+        {\fontsize{9}{11}\selectfont\coverfontlight\@date}
+      \end{flushright}
+    \end{minipage}
+  }
   \end{textblock*}
   %
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
   %
   % Add footer
-  \frontcoverfooterXII{#2}
+  \frontcoverfooterXXIV{#2}
 }
 
-\newcommand{\makefrontcoverX}{\makefrontcovergeneralX{0mm}{1}}
-% \makefrontcovergeneralX{xskip}{}clearpage
-\newcommand{\makefrontcovergeneralX}[2]{%
-\typeout{adsphd.cls: Using default front cover page}
-  %
-  % Create header
-  \frontcoverheaderX{#1}
-  %
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
-  %
-  % Title, subtitle, authorname, text and date can be moved around.
-  % Change the textblock* commands below. 
-  %
-  % Syntax of textblock environment:
-  % 
-  %   \begin{textblock*}{width}(xpos,ypos)
-  %     ...
-  %   \end{textblock*}
-  % 
-  % !! Make sure not to remove the '+#1' part!!!
-  %
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
-  %
-  % Place the DRAFT notifier on the front page to avoid printing a wrong
-  % version
-  \ifadsphd@final\else
-    \begin{textblock*}{120mm}(17.5mm+#1,90mm)
-    \textblockcolour{}
-    \vspace{-\parskip}
-    \begin{center}
-        \selectfont\LARGE\sffamily\textbf{\color{red}{
-            DRAFT\\
-            {\small To remove, add `final' to class options}
-        }}
-    \end{center}
-    \end{textblock*}
-  \fi
-  %
-  % Place the title
-  \begin{textblock*}{120mm}(17.5mm+#1,112.5mm)
-  \textblockcolour{}
-  \vspace{-\parskip}
-  \raggedright\selectfont\LARGE\sffamily\textbf{\@title}
-  \end{textblock*}
-  %
-  % Place the subtitle
-  \begin{textblock*}{120mm}(17.5mm+#1,132mm)
-  \textblockcolour{}
-  \vspace{-\parskip}
-  \Large\sffamily{\@subtitle}
-  \end{textblock*}
-  %
-  % Place the author name
-  \begin{textblock*}{120mm}(17.5mm+#1,147.5mm)
-  \textblockcolour{}
-  \vspace{-\parskip}
-  \Large\sffamily\@authorf\ \MakeUppercase\@authorl
-  \end{textblock*}
-  %
-  % Place the misc text
-  \begin{textblock*}{60mm}(97.5mm+#1,192.5mm)
-  \textblockcolour{}
-  \vspace{-\parskip}
-  {\small\sffamily Dissertation presented in partial\\
-  \fulfillment\ of the requirements for\\
-  the degree of \@phddegree}
-  \end{textblock*}
-  %
-  % Place date
-  \begin{textblock*}{\adsphdpaperwidth}(0mm+#1,221.5mm)
-  \textblockcolour{}
-  \vspace{-\parskip}
-  \begin{center} {\small\sffamily\@date }\end{center}
-  \end{textblock*}
-  %
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
-  %
-  % Add footer
-  \frontcoverfooterX{#2}
+\let\orig@makefrontcovergeneralXXIV\makefrontcovergeneralXXIV
 
-}
 
-\let\orig@makefrontcovergeneralX\makefrontcovergeneralX
-\let\orig@makefrontcovergeneralXII\makefrontcovergeneralXII
-
-\newcommand{\theUseOfGenAI}{}
-\newcommand{\useOfGenAI}[1]{\renewcommand{\theUseOfGenAI}{#1}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Redefine title page
@@ -1651,98 +1688,16 @@ De appendices kunnen desgevallend worden gebundeld in een apart boekdeel.
 \cleardoublepage
 \thispagestyle{empty} \mbox{}
 
-%\begin{textblock}{120}(0,37.5)
-\begin{textblock}{120}(17.5,70)
-\textblockcolour{}
-\vspace{-\parskip}
-\begin{flushleft}
-\Large\sffamily\textbf{\@title}
-\end{flushleft}
-\end{textblock}
-%
-%\begin{textblock}{120}(0,47.5)
-\begin{textblock}{120}(17.5,85.0)
-\textblockcolour{}
-\vspace{-\parskip}
-\large\sffamily{\@subtitle}
-\end{textblock}
-%
-%\begin{textblock}{120}(0,72.5)
-\begin{textblock}{120}(17.5,105)
-\textblockcolour{}
-\vspace{-\parskip}
-\large\sffamily\textbf{\@authorf\ \MakeUppercase\@authorl}
-\end{textblock}
-%
-%\begin{textblock}{120}(0,125)
-\begin{textblock}{160}(17.5,157.5)
-\textblockcolour{}
-\vspace{-\parskip}
-\begin{minipage}[t]{7.32cm}
-%  \begin{tabular}[t]{p{6.9cm}}
-    Examination committee:
-    \DTLforeach{president}{\name=name,\affiliation=affiliation}{%
-    \\\name, chair
-    \ifthenelse{\equal{\affiliation}{}}{}{%
-      \\\rule{0.5cm}{0pt}(\affiliation)
-    }}
-    \DTLforeach{supervisor}{\name=name,\affiliation=affiliation}{%
-    \\\name, supervisor
-    \ifthenelse{\equal{\affiliation}{}}{}{%
-      \\\rule{0.25cm}{0pt}(\affiliation)
-    }}
-    %\DTLforeach{cosupervisor}{\name=name,\affiliation=affiliation}{%
-    %\\\name%, co-supervisor
-    %\ifthenelse{\equal{\affiliation}{}}{}{%
-      %\\\rule{0.25cm}{0pt}(\affiliation)
-    %}}
-    \DTLforeach{jury}{\name=name,\affiliation=affiliation}{%
-    \\\name
-    \ifthenelse{\equal{\affiliation}{}}{}{%
-      \rule{0.5cm}{0pt}(\affiliation)
-    }}
-    \DTLforeach{externaljury}{\name=name,\affiliation=affiliation}{%
-    \\\name
-    \\\rule{0.25cm}{0pt}(\affiliation)
-    }
-    \\
-    \if\empty\@udc \else U.D.C. \@udc\fi
-%  \end{tabular}
-\end{minipage}
-\begin{minipage}[t]{5.3cm}
-%  \begin{tabular}[t]{l}
-    Dissertation presented in partial
-    \fulfillment\ of the requirements for
-    the degree of \@phddegree
-%  \end{tabular}
-\end{minipage}
+\titlepageXXIV
 
-%\begin{tabular}{p{7cm}l}
-% Jury:                                                   & Dissertation presented in partial
-% \@president, president                                  & fulfillment of the requirements for
-% \@supervisor, supervisor                                & the degree of \@phddegree
-% titles first name last name                             & \\
-% titles first name last name                             & \\
-%   \rule{0.25cm}{0pt}(external affiliation)              & \\
-%                                                         & \\
-% U.D.C. \@udc
-%\end{tabular}
-\end{textblock}
-%\vfill
-%\begin{center} {\@date} \end{center}
-\begin{textblock}{160}(0,210.0)
-\textblockcolour{}
-\vspace{-\parskip}
-\begin{center} \@date \end{center}
-\end{textblock}
 % NEW PAGE
 %\pagenumbering{roman}
 \newpage
 \thispagestyle{empty}
 \mbox{}
 \vfill
-{\scriptsize\sffamily{\setlength{\parindent}{0ex}\copyright{}~\@copyyear~KU Leuven -- \@faculty \\
-Uitgegeven in eigen beheer, \@authorf~\@authorl, \@address, \@addresspc{} (Belgium)}
+{\scriptsize\sffamily{\setlength{\parindent}{0ex}\copyright{}~\@copyyear~\@authorf~\@authorl \\
+Uitgegeven in eigen beheer, \@authorf~\@authorl, \@copyaddress{} (Belgium)}
 
 \bigskip
 \selectlanguage{dutch}
@@ -1766,20 +1721,6 @@ without written permission from the publisher.
 \ifthenelse{\equal{\@isbn}{}}{}{ISBN \@isbn\\}
 \ifthenelse{\equal{\@depot}{}}{}{D/\@depot}
 
-\textbf{Use of Generative AI}\\
-\ifthenelse{\equal{\theUseOfGenAI}{}}{%
-  \textbf{\color{red}Uncomment the appropriate sentences in the \textbackslash useOfGenAI command
-  and expand the text where needed to make it more specific and add topics if they are not covered
-  by any of the indicated topics.
-  The following sentences will be added by default:}
-}{% 
-  \theUseOfGenAI
-}%
-The text, code, and images in this thesis are my own (unless otherwise specified). Generative AI has
-only been used in accordance with the KU~Leuven guidelines and appropriate references have been added.
-I have reviewed and edited the content as needed and I take full responsibility for the content of
-the thesis.
-
 }
 %\vspace{1cm}
 
@@ -1787,64 +1728,97 @@ the thesis.
 \cleartextposbox
 }
 
+
+\newcommand{\titlepageXXIV}{%
+%
+% Title block
+\begin{textblock}{120}(16,70)  % {hsize}(hpos,vpos)
+\textblockcolour{}
+\vspace{-\parskip}
+\begin{flushleft}
+  \coverfontsize{20}{22}\titlepagefont\textbf{\MakeUppercase\@title}\\[1ex]
+  \coverfontsize{14}{16}\titlepagefont{\MakeUppercase\@subtitle}
+\end{flushleft}
+\end{textblock}
+%
+% Author block
+\begin{textblock}{120}(16,105)
+  \textblockcolour{}
+  \vspace{-\parskip}
+  \fontsize{12}{14}\titlepagefont{\@authorf\ \MakeUppercase\@authorl}
+\end{textblock}
+%
+% Committee block
+\begin{textblock}{160}(16,125)
+  \textblockcolour{}
+  \vspace{-\parskip}
+  \begin{minipage}[b][60mm][b]{7.32cm}
+    \fontsize{10}{11}\selectfont\titlepagefont
+    \dtlifnumlt{\DTLrowcount{supervisor}}{2}{Supervisor:}{Supervisors:}
+    \DTLforeach{supervisor}{\name=name,\affiliation=affiliation}{%
+    \\\name
+    \ifthenelse{\equal{\affiliation}{}}{}{%
+      \\\rule{0.25cm}{0pt}(\affiliation)
+    }}
+    \\[1em]
+    Members of the\\
+    Examination Committee:
+    \DTLforeach{president}{\name=name,\affiliation=affiliation}{%
+    \\\name, chair
+    \ifthenelse{\equal{\affiliation}{}}{}{%
+      \\\rule{0.5cm}{0pt}(\affiliation)
+    }}
+    \DTLforeach{jury}{\name=name,\affiliation=affiliation}{%
+    \\\name
+    \ifthenelse{\equal{\affiliation}{}}{}{%
+      \rule{0.5cm}{0pt}(\affiliation)
+    }}
+    \DTLforeach{externaljury}{\name=name,\affiliation=affiliation}{%
+    \\\name
+    \\\rule{0.25cm}{0pt}(\affiliation)
+    }
+    \if\empty\@udc \else \\U.D.C. \@udc\fi
+  \end{minipage}
+  \begin{minipage}[b][60mm][b]{5.3cm}
+    \fontsize{10}{11}\selectfont\titlepagefont
+    Dissertation presented in partial
+    \fulfillment\ of the requirements for
+    the degree of \@phddegree
+  \end{minipage}
+\end{textblock}
+%
+% Date block
+\begin{textblock}{160}(0,210.0)
+  \textblockcolour{}
+  \fontsize{10}{11}\selectfont\titlepagefont
+  \vspace{-\parskip}
+  \begin{center} \@date \end{center}
+\end{textblock}
+} % End of \titlepageXXIV
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Provide back cover using the 2010 (X) layout
+% Provide back cover using the 2024 (XXIV) layout
 % used by the Arenberg Doctoral School
-\newcommand{\backcoverheaderX}[2]{%
-  \typeout{adsphd.cls: Using default back cover page}
-  % Use Helvetica
-  \renewcommand{\sfdefault}{\helvetsfdefault}
-  %
-  % Only add empty pages if asked for
-  \ifthenelse{\equal{#2}{1}}
-  {
-    \cleardoublepage \mbox{}
-    \thispagestyle{empty}
-    \newpage
-  }{}
-  \thispagestyle{empty}
-  %
-  % Create gray box
-  \begin{textblock*}{152.5mm+\rbleed}(-\rbleed+#1,20mm)
-  \textblockcolour{gray}
-  \vspace{-\parskip}
-  \parbox[c][20mm]{151.2mm+\rbleed}{
-  \flushright
-  \vspace{-3mm}
-  {\bfseries \scriptsize \textcolor{white} {\sffamily{}Arenberg Doctoral School of Science, Engineering \& Technology} \ \ }\\[-1mm]
-  {\scriptsize \textcolor{white} {\sffamily\@faculty\ \ }}\\[-1.2mm]
-  {\scriptsize \textcolor{white} {\sffamily\@department \ \ }}\\[-1.2mm]
-  {\scriptsize \textcolor{white} {\sffamily\@researchgroup\ \ }}\\[-1.2mm]
-  {\scriptsize \textcolor{white} {\sffamily\@address\ \ }}\\[-1.2mm]
-  {\scriptsize \textcolor{white} {\sffamily{}\@addresspc\ \ }}
-  }
-  \end{textblock*}
-  %
-  %
-  % Create blue background
-  \setlength{\tmplength}{\adsphdpaperwidth}
-  \addtolength{\tmplength}{-152mm}
-  \addtolength{\tmplength}{\rbleed}
-  \begin{textblock*}{\tmplength}(152.0mm+#1,20mm)
-  \textblockcolour{}
-  \includegraphics[width=\tmplength,height=20mm]{image/blue}%
-  \end{textblock*}
-  %
-  % Put KULeuven logo on top
-  \begin{textblock*}{7mm}(153.37mm+#1,20mm)
-  \textblockcolour{}
-  \vspace{-\parskip}
-  \includegraphics*[angle=90,height=20mm]{image/kullogo2}%
-  \end{textblock*}
+\newcommand{\makebackcoverXXIV}{
+    \ifadsphd@joint
+    \makebackcovergeneralXXIVjoint{0mm}{1}
+    \else
+    \makebackcovergeneralXXIV{0mm}{1}
+    \fi
 }
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Provide back cover using the 2012 (XII) layout
-% used by the Arenberg Doctoral School
-\newcommand{\backcoverheaderXII}[2]{%
-  \typeout{adsphd.cls: Using default XII back cover page}
+\ifadsphd@epub
+  \renewcommand{\makebackcoverXXIV}{}
+\fi
+\newcommand{\makebackcovergeneralXXIV}[2]{%
+  \typeout{adsphd.cls: Using default back cover page}
+  %
   % Use Helvetica
+  \ifadsphd@helveticaneue
+  \else
   \renewcommand{\sfdefault}{\helvetsfdefault}
+  \fi
   %
   % Only add empty pages if asked for
   \ifthenelse{\equal{#2}{1}}
@@ -1854,110 +1828,105 @@ the thesis.
     \newpage
   }{}
   \thispagestyle{empty}
-
-  % Blue lines in right corner
   %
-  \begin{textblock*}{55mm}(#1+97.5mm,20mm)
-  \textblockcolour{kullightblue}
+  % Background colored block
+  \begin{textblock*}{\adsphdpaperwidth+\lbleed+\rbleed}(#1-\rbleed,18mm+\tbleed)
+  %\begin{textblock*}{\adsphdpaperwidth}(0mm+#1,234mm)
+  \textblockcolour{kulprimaryblue}
   %\vspace{-\parskip}
-  \rule{0pt}{2mm}
-  \end{textblock*}
-  \begin{textblock*}{2mm}(#1+152mm,20mm)
-  \textblockcolour{kullightblue}
-  %\vspace{-\parskip}
-  \rule{0pt}{18mm}
+  \rule{0pt}{34mm}
   \end{textblock*}
   %
-  % Create gray box
-  \begin{textblock*}{137.5mm}(#1,23mm)
+  % Text box with address
+  \begin{textblock*}{124.5mm}(#1,24.5mm+\tbleed)
   \textblockcolour{}
   \vspace{-\parskip}
   %\parbox[c][20mm]{151.2mm+\rbleed}{
-  \flushright
-  %\vspace{-3mm}
-  {\scriptsize {\sffamily\MakeUppercase\@faculty}}\\[-1mm]
-  {\scriptsize {\sffamily\MakeUppercase\@department}}\\[-1mm]
-  \ifdefempty{\@researchgroup}{}{{\scriptsize {\sffamily\MakeUppercase\@researchgroup}}\\[-1mm]}
-  {\scriptsize {\sffamily\@address}}\\[-1mm]
-  {\scriptsize {\sffamily{}\@addresspc}}\\[-1mm]
-  \ifdefempty{\@email}{}{{\scriptsize {\sffamily{}\@email}}\\[-1mm]}
-  \ifdefempty{\@website}{}{{\scriptsize {\sffamily{}\@website}}}
+  \begin{flushright}
+    \fontsize{7}{10}\coverfont\color{white}
+    \MakeUppercase\@faculty\\[-1mm]
+    \MakeUppercase\@department\\[-1mm]
+    % \ifdefempty{\@researchgroup}{}{{\MakeUppercase\@researchgroup}}\\[-1mm]
+    {\@address}\\[-1mm]
+    {\@addresspc}\\[-1mm]
+    \ifdefempty{\@email}{}{\@email}\\[-1mm]
+    \ifdefempty{\@website}{}{\@website}
+  \end{flushright}
   %}
   \end{textblock*}
   %
-  %
-  % Create blue background
-  %\setlength{\tmplength}{\adsphdpaperwidth}
-  %\addtolength{\tmplength}{-152mm}
-  %\addtolength{\tmplength}{\rbleed}
-  %\begin{textblock*}{\tmplength}(152.0mm+#1,20mm)
-  %\textblockcolour{}
-  %\includegraphics[width=\tmplength,height=20mm]{image/blue}%
-  %\end{textblock*}
-  %
-  % Put KULeuven sedes on top
-  \begin{textblock*}{7mm}(140mm+#1,24mm)
-  \textblockcolour{}
-  \vspace{-\parskip}
-  \includegraphics*[height=15mm]{image/sedes}%
-  \end{textblock*}
-}
-
-\newcommand{\backcoverfooterX}[1]{%
-  % Put logo of the association at the bottom right
-  \begin{textblock*}{7mm}[2.,1.](150mm+#1,231.0mm)
-  \textblockcolour{}
-  \vspace{-\parskip}
-  \includegraphics*[height=20mm]{image/ASSO_ZEGEL_ZW}
-  \end{textblock*}
-  %
-  % Restore font
-  \renewcommand{\sfdefault}{\origsfdefault}
-}
-
-\newcommand{\backcoverfooterXII}[1]{%
-  % Bottom blue bar
-  %\begin{textblock*}{\adsphdpaperwidth}(#1,222mm)
-  \begin{textblock*}{\adsphdpaperwidth+\lbleed+\rbleed}(#1-\rbleed,222mm)
-  %\begin{textblock*}{\adsphdpaperwidth}(0mm+#1,234mm)
-  \textblockcolour{kulprimaryblue}
+  % Blue vertical line
+  \begin{textblock*}{1.5mm}(#1+129mm,27.5mm+\tbleed)
+  \textblockcolour{kullightblue}
   %\vspace{-\parskip}
   \rule{0pt}{15mm}
   \end{textblock*}
   %
-  % Restore font
-  \renewcommand{\sfdefault}{\origsfdefault}
+  % Put KULeuven sedes on top
+  \begin{textblock*}{7mm}(135mm+#1,26.9mm+\tbleed)
+  \textblockcolour{}
+  \vspace{-\parskip}
+  \includegraphics*[height=16.3mm]{image/sedes.png}%
+  \end{textblock*}
 }
 
-\newcommand{\makebackcoverXII}{\makebackcovergeneralXII{0mm}{1}}
-\ifadsphd@epub
-  \renewcommand{\makebackcoverXII}{}
-\fi
-% \makebackcovergeneralXII{xskip}{clearpage}
-\newcommand{\makebackcovergeneralXII}[2]{%
-\typeout{adsphd.cls: Using default back cover page}
-  %
-  % Create header
-  \backcoverheaderXII{#1}{#2}
-  %
-  % Add footer
-  \backcoverfooterXII{#1}
-}
+\let\orig@makebackcovergeneralXXIV\makebackcovergeneralXXIV
 
-\newcommand{\makebackcoverX}{\makebackcovergeneralX{0mm}{1}}
-% \makebackcovergeneralX{xskip}{clearpage}
-\newcommand{\makebackcovergeneralX}[2]{%
-\typeout{adsphd.cls: Using default back cover page}
+\newcommand{\makebackcovergeneralXXIVjoint}[2]{%
+  \typeout{adsphd.cls: Using default back cover page}
   %
-  % Create header
-  \backcoverheaderX{#1}{#2}
+  % Use Helvetica
+  \ifadsphd@helveticaneue
+  \else
+  \renewcommand{\sfdefault}{\helvetsfdefault}
+  \fi
   %
-  % Add footer
-  \backcoverfooterX{#1}
+  % Only add empty pages if asked for
+  \ifthenelse{\equal{#2}{1}}
+  {
+    \cleardoublepage \mbox{}
+    \thispagestyle{empty}
+    \newpage
+  }{}
+  \thispagestyle{empty}
+  % 
+  % Blue bar on top
+  \begin{textblock*}{\adsphdpaperwidth+\lbleed+\rbleed}(#1-\rbleed,0mm)
+  \textblockcolour{kulprimaryblue}
+  \rule{0mm}{18mm+\tbleed}
+  \end{textblock*}
+  %
+  % Blue bar below logos
+  \begin{textblock*}{\adsphdpaperwidth+\lbleed+\rbleed}(#1-\rbleed,38mm+\tbleed)
+  \textblockcolour{kulprimaryblue}
+  \rule{0mm}{18mm}
+  \end{textblock*}
+  %
+  % Text box with address KU Leuven
+  \begin{textblock*}{\adsphdpaperwidth+\lbleed+\rbleed}(#1-16mm, 21mm+\tbleed)
+  \textblockcolour{}
+    \fontsize{7}{10}\coverfont
+    \raggedleft
+    \MakeUppercase\@faculty\\[-1mm]
+    \MakeUppercase\@department\\[-1mm]
+    {\@address}\\[-1mm]
+    {\@addresspc}\\[-1mm]
+    \ifdefempty{\@email}{}{\@email\\[-1mm]}
+    \ifdefempty{\@website}{}{\@website\\[-1mm]}
+  \end{textblock*}
+  % 
+  % Text box with address partner university
+  \begin{textblock*}{100mm}(#1+16mm, 21mm+\tbleed)
+  \textblockcolour{}
+    \fontsize{7}{10}\coverfont
+    \MakeUppercase\@facultypartner\\[-1mm]
+    \MakeUppercase\@departmentpartner\\[-1mm]
+    {\@addresspartner}\\[-1mm]
+    {\@addresspcpartner}\\[-1mm]
+    \ifdefempty{\@emailpartner}{}{\@emailpartner\\[-1mm]}
+    \ifdefempty{\@websitepartner}{}{\@websitepartner\\[-1mm]}
+  \end{textblock*}
 }
-
-\let\orig@makebackcovergeneralX\makebackcovergeneralX
-\let\orig@makebackcovergeneralXII\makebackcovergeneralXII
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Create the spine of the booklet
@@ -1967,90 +1936,15 @@ the thesis.
 \newlength{\spinetitlewidth}
 \setlength{\spinetitlewidth}{\defaultspinetitlewidth}
 
-%\newcommand{\makespine}[2]{\makespinegeneralX{xskip}{clearpage}{spinewidth}{spinetitlewidth}}
-\newcommand{\makespine}[2]{\makespinegeneralX{0mm}{1}{#1}{#2}}
-\newcommand{\makespinegeneralX}[4]{%
-  % Use Helvetica
-  \renewcommand{\sfdefault}{\helvetsfdefault}
-  %
-  % Get adsphdspinewidth as #3
-  \setlength{\adsphdspinewidth}{#3}
-  % 
-  % Get spinetitlewidth as #4
-  \ifthenelse{\equal{#4}{}}
-  {}{
-    \setlength{\spinetitlewidth}{#4}
-  }
-  %
-  % Empty pagestyle
-  \thispagestyle{empty}%
-  %
-  % Only clear page if asked for
-  \ifthenelse{\equal{#2}{1}}
-  {
-    \cleardoublepage \mbox{}%
-  }{}
-  %
-  % Create blue box
-  \begin{textblock*}{\adsphdspinewidth}(0mm+#1,20mm)
-  \textblockcolour{}
-  \vspace{-\parskip}
-  \includegraphics[width=\adsphdspinewidth,height=20mm]{image/blue}%
-  \end{textblock*}
-  %
-  \newlength{\authorlen}
-  \settowidth{\authorlen}{\large\sffamily\@authorf\ \MakeUppercase\@authorl}
-  \newlength{\authorlenpenalty}
-  \ifthenelse{\lengthtest{\authorlen>4.2cm}}{%
-      % For really really long names, move the name up a bit more
-      \typeout{adsphd.cls: Really long author name detected in %
-        generation of spine. Moving it up by 4mm.}
-      \setlength{\authorlenpenalty}{4mm}
-  }{%
-    \ifthenelse{\lengthtest{\authorlen>4.0cm}}{%
-      % For really long names, move the name up a bit
-      \typeout{adsphd.cls: Long author name detected in generation of %
-        spine. Moving it up by 3mm.}
-      \setlength{\authorlenpenalty}{3mm}
-    }{%
-    \setlength{\authorlenpenalty}{0mm}
-    }
-  }
-  %
-  \begin{textblock*}{\adsphdspinewidth}(0mm+#1,49mm-\authorlenpenalty) % 9mm whitespace 
-                                        % between blue and first letter of the author name
-                                        % (possibly less because the author name might be
-                                        % reallyreally long)
-  \textblockcolour{}
-  % Rotate the text
-  \begin{turn}{-90}
-  \makebox[\adsphdpaperheight-56mm+\authorlenpenalty][c]{% 20mm(white)+20mm(blue)+9mm(space before name)+7mm(after date)
-  %
-  % Place author
-  \parbox[c][\adsphdspinewidth]{(\authorlen)}{
-  \large\sffamily\@authorf\ \MakeUppercase\@authorl%
-  }
-  \hfill
-  %
-  % Place title
-  \parbox[c][\adsphdspinewidth]{\spinetitlewidth}{
-    \centering
-    \setstretch{.85}
-    \normalsize\sffamily\textbf{\MakeUppercase\@title}
-  }
-  %
-  % Place date
-  \hfill\large\sffamily\@date
-  }
-  \end{turn}
-  \end{textblock*}
+%\newcommand{\makespine}[2]{\makespinegeneralXXIV{xskip}{clearpage}{spinewidth}{spinetitlewidth}}
+\newcommand{\makespine}[2]{\makespinegeneralXXIV{0mm}{1}{#1}{#2}}
 
-  \renewcommand{\sfdefault}{\origsfdefault}
-}
-
-\newcommand{\makespinegeneralXII}[4]{%
+\newcommand{\makespinegeneralXXIV}[4]{%
   % Use Helvetica
+  \ifadsphd@helveticaneue
+  \else
   \renewcommand{\sfdefault}{\helvetsfdefault}
+  \fi
   %
   % Get adsphdspinewidth as #3
   \setlength{\adsphdspinewidth}{#3}
@@ -2071,7 +1965,7 @@ the thesis.
   }{}
   %
   \newlength{\authorlen}
-  \settowidth{\authorlen}{\large\sffamily\@authorf\ \MakeUppercase\@authorl}
+  \settowidth{\authorlen}{\fontsize{9}{11}\coverfont\@authorf\ \@authorl}
   \newlength{\authorlenpenalty}
   \ifthenelse{\lengthtest{\authorlen>4.2cm}}{%
       % For really really long names, move the name up a bit more
@@ -2089,18 +1983,18 @@ the thesis.
     }
   }
   %
-  \begin{textblock*}{\adsphdspinewidth}(0mm+#1,20mm-\authorlenpenalty) % 9mm whitespace 
+  \begin{textblock*}{\adsphdspinewidth}(0mm+#1,18mm-\authorlenpenalty+\tbleed) % 9mm whitespace 
                                         % between blue and first letter of the author name
                                         % (possibly less because the author name might be
                                         % reallyreally long)
   \textblockcolour{}
   % Rotate the text
   \begin{turn}{-90}
-  \makebox[\adsphdpaperheight-24mm+\authorlenpenalty][c]{% 20mm(white)+20mm(blue)+9mm(space before name)+7mm(after date)
+  \makebox[\adsphdpaperheight-34mm+\authorlenpenalty][c]{% 20mm(white)+20mm(blue)+9mm(space before name)+7mm(after date)
   %
   % Place author
   \parbox[c][\adsphdspinewidth]{(\authorlen)}{
-  \large\sffamily\@authorf\ \MakeUppercase\@authorl%
+  \fontsize{9}{11}\coverfont\@authorf\ \@authorl%
   }
   \hfill
   %
@@ -2108,17 +2002,18 @@ the thesis.
   \parbox[c][\adsphdspinewidth]{\spinetitlewidth}{
     \centering
     \setstretch{.85}
-    \normalsize\sffamily\textbf{\MakeUppercase\@title}
+    \fontsize{9}{11}\coverfont{\@title}
   }
   %
   % Place date
-  \hfill\large\sffamily\@date
+  \hfill\fontsize{9}{11}\coverfont\@date
   }
   \end{turn}
   \end{textblock*}
 
   \renewcommand{\sfdefault}{\origsfdefault}
 }
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -2131,7 +2026,9 @@ the thesis.
 % Use own version of the cover page
 \useCustomCoverpageIfExists
 
+
 \endinput
 %%
 %% End of file `adsphd.cls'.
 %% vim: tw=70 expandtab
+

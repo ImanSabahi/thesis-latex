@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # encoding: utf-8
 #
-# Copyright (C), 2012-2014 by Wannes Meert, KU Leuven
+# Copyright (C), 2012-2025 by Wannes Meert, KU Leuven
 #
 # Very naive compilation script for the ADSPHD class.
 #
@@ -222,6 +222,7 @@ def cover():
         cf.write("""
 \\usepackage{printlen}
 \\uselengthunit{mm}
+\\IfFileExists{tikz}{\\usepackage{tikz}\\usetikzlibrary {arrows.meta}}{}
 """)
         cf.write("".join(content))
         cf.write("""
@@ -231,10 +232,15 @@ def cover():
 \\addtolength{\\fullpagewidth}{2\\defaultlbleed}
 \\addtolength{\\fullpagewidth}{2\\defaultrbleed}
 \\addtolength{\\fullpagewidth}{\\adsphdspinewidth}
+% Compute total page height
+\\newlength{\\fullpageheight}
+\\setlength{\\fullpageheight}{\\adsphdpaperheight}
+\\addtolength{\\fullpageheight}{\\defaulttbleed}
+\\addtolength{\\fullpageheight}{\\defaultbbleed}
 
 \\geometry{
 	paperwidth=\\fullpagewidth,
-	paperheight=\\adsphdpaperheight,
+	paperheight=\\fullpageheight,
 }
 
 \\pagestyle{empty}
@@ -245,21 +251,23 @@ def cover():
 
 \\makefullcoverpage{\\adsphdspinewidth}{}
 
-\\newlength{\\testje}
-\\setlength{\\testje}{10mm}
-
 \\mbox{}
 \\newpage
 \\subsection*{Used settings:}
 \\begin{itemize}
 	\\item Spine width: \\printlength{\\adsphdspinewidth}
-	\\item Left bleed: \\printlength{\\lbleed}
-	\\item Right bleed: \\printlength{\\rbleed}
+	\\item Left bleed: \\printlength{\\lbleed} (bleed into spine)
+	\\item Right bleed: \\printlength{\\rbleed} (bleed over edge of paper)
+	\\item Top bleed: \\printlength{\\tbleed}
+	\\item Bottom bleed: \\printlength{\\bbleed}
 	\\item Paper width: \\printlength{\\adsphdpaperwidth}
 	\\item Paper height: \\printlength{\\adsphdpaperheight}
 	\\item Text width: \\printlength{\\textwidth}
 	\\item Text height: \\printlength{\\textheight}
 \\end{itemize}
+
+\\drawextracroplines
+\\drawextracroplinesexplanation
 
 \\end{document}
 """)
