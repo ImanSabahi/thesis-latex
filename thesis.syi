@@ -1,0 +1,74 @@
+\glossarysection[\glossarytoctitle]{\glossarytitle}\glossarypreamble
+\begin{theglossary}\glossaryheader
+\glsgroupheading{glssymbols}\relax \glsresetentrylist %
+\glossentry{TransferFunc}{\glossaryentrynumbers{\relax 
+		\setentrycounter[]{page}\glsnumberformat{a}}}%
+\glossentry{theta}{\glossaryentrynumbers{\relax 
+		\setentrycounter[]{page}\glsnumberformat{a}}}%
+\glossentry{fourierTransform}{\glossaryentrynumbers{\relax 
+		\setentrycounter[]{page}\glsnumberformat{a}}}%
+\glossentry{complexSet}{\glossaryentrynumbers{\relax 
+		\setentrycounter[]{page}\glsnumberformat{a}}}%
+\glossentry{damping}{\glossaryentrynumbers{\relax 
+		\setentrycounter[]{page}\glsnumberformat{a}}}%
+\glossentry{dampingMat}{\glossaryentrynumbers{\relax 
+		\setentrycounter[]{page}\glsnumberformat{a}}}%
+\glossentry{dampingMatAug}{\glossaryentrynumbers{\relax 
+		\setentrycounter[]{page}\glsnumberformat{a}}}%
+\glossentry{dampingMatRed}{\glossaryentrynumbers{\relax 
+		\setentrycounter[]{page}\glsnumberformat{a}}}%
+\glossentry{diag}{\glossaryentrynumbers{\relax 
+		\setentrycounter[]{page}\glsnumberformat{a}}}%
+\glossentry{displacementVec}{\glossaryentrynumbers{\relax 
+		\setentrycounter[]{page}\glsnumberformat{a}}}%
+\glossentry{forceVec}{\glossaryentrynumbers{\relax 
+		\setentrycounter[]{page}\glsnumberformat{a}}}%
+\glossentry{forceVecFreq}{\glossaryentrynumbers{\relax 
+		\setentrycounter[]{page}\glsnumberformat{a}}}%
+\glossentry{freq}{\glossaryentrynumbers{\relax 
+		\setentrycounter[]{page}\glsnumberformat{a}}}%
+\glossentry{genDispVec}{\glossaryentrynumbers{\relax 
+		\setentrycounter[]{page}\glsnumberformat{a}}}%
+\glossentry{genDispVecFreq}{\glossaryentrynumbers{\relax 
+		\setentrycounter[]{page}\glsnumberformat{a}}}%
+\glossentry{inputMatCont}{\glossaryentrynumbers{\relax 
+		\setentrycounter[]{page}\glsnumberformat{a}}}%
+\glossentry{inputMatDisc}{\glossaryentrynumbers{\relax 
+		\setentrycounter[]{page}\glsnumberformat{a}}}%
+\glossentry{massMat}{\glossaryentrynumbers{\relax 
+		\setentrycounter[]{page}\glsnumberformat{a}}}%
+\glossentry{massMatAug}{\glossaryentrynumbers{\relax 
+		\setentrycounter[]{page}\glsnumberformat{a}}}%
+\glossentry{massMatRed}{\glossaryentrynumbers{\relax 
+		\setentrycounter[]{page}\glsnumberformat{a}}}%
+\glossentry{naturalFreq}{\glossaryentrynumbers{\relax 
+		\setentrycounter[]{page}\glsnumberformat{a}}}%
+\glossentry{numInputLoads}{\glossaryentrynumbers{\relax 
+		\setentrycounter[]{page}\glsnumberformat{a}}}%
+\glossentry{numRedStates}{\glossaryentrynumbers{\relax 
+		\setentrycounter[]{page}\glsnumberformat{a}}}%
+\glossentry{numStates}{\glossaryentrynumbers{\relax 
+		\setentrycounter[]{page}\glsnumberformat{a}}}%
+\glossentry{outputVec}{\glossaryentrynumbers{\relax 
+		\setentrycounter[]{page}\glsnumberformat{a}}}%
+\glossentry{realSet}{\glossaryentrynumbers{\relax 
+		\setentrycounter[]{page}\glsnumberformat{a}}}%
+\glossentry{reductionMat}{\glossaryentrynumbers{\relax 
+		\setentrycounter[]{page}\glsnumberformat{a}}}%
+\glossentry{selectionMat}{\glossaryentrynumbers{\relax 
+		\setentrycounter[]{page}\glsnumberformat{a}}}%
+\glossentry{selectionMatForce}{\glossaryentrynumbers{\relax 
+		\setentrycounter[]{page}\glsnumberformat{a}}}%
+\glossentry{selectionMatForceRed}{\glossaryentrynumbers{\relax 
+		\setentrycounter[]{page}\glsnumberformat{a}}}%
+\glossentry{stateMatCont}{\glossaryentrynumbers{\relax 
+		\setentrycounter[]{page}\glsnumberformat{a}}}%
+\glossentry{stateMatDisc}{\glossaryentrynumbers{\relax 
+		\setentrycounter[]{page}\glsnumberformat{a}}}%
+\glossentry{stateVec}{\glossaryentrynumbers{\relax 
+		\setentrycounter[]{page}\glsnumberformat{a}}}%
+\glossentry{stiffMat}{\glossaryentrynumbers{\relax 
+		\setentrycounter[]{page}\glsnumberformat{a}}}%
+\glossentry{stiffMatRed}{\glossaryentrynumbers{\relax 
+		\setentrycounter[]{page}\glsnumberformat{a}}}%
+\end{theglossary}\glossarypostamble

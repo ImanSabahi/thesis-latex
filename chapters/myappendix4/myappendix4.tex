@@ -1,0 +1,78 @@
+% !TeX root = ../../thesis.tex
+\chapter{Modeshapes of the plate}\label[appendix]{ch:myappendix4}
+
+
+\begin{figure}[htp]
+    \centering
+    \begin{tikzpicture}[
+            % Global font style
+            font=\sffamily,
+            % Style for the "Mode X:" labels
+            mode label/.style={
+                    anchor=north west,
+                    font=\normalsize\bfseries,
+                    inner sep=10pt, % Padding from the corner
+                    text=black
+                },
+            % Style for the "Point X" labels in Mode 1
+            point label/.style={
+                    font=\normalsize\bfseries,
+                    anchor=east,
+                    inner sep=5pt
+                }
+        ]
+        \def\picwidth{5.5} % half length of each legend line sample
+
+        % --- Create the 3x2 Grid of Images ---
+        \matrix[
+            matrix of nodes,
+            nodes={
+                    inner sep=0pt,
+                    outer sep=0pt,
+                    anchor=center
+                },
+            column sep=0.5cm, % Horizontal gap between images
+            row sep=0.5cm,    % Vertical gap between images
+        ] (m) {
+            % --- Row 1 ---
+            \includegraphics[width=\picwidth cm]{1 - Copy.png} &
+            \includegraphics[width=\picwidth cm]{2.png}          \\
+            % --- Row 2 ---
+            \includegraphics[width=\picwidth cm]{3.png}        &
+            \includegraphics[width=\picwidth cm]{4.png}          \\
+            % --- Row 3 ---
+            \includegraphics[width=\picwidth cm]{5.png}        &
+            \includegraphics[width=\picwidth cm]{6.png}          \\
+        };
+
+        % --- Add "Mode X:" Labels ---
+        % Row 1 Labels
+        \node[mode label] at (m-1-1.north west) {Mode 1:};
+        \node[mode label] at (m-1-2.north west) {Mode 2:};
+
+        % Row 2 Labels
+        \node[mode label] at (m-2-1.north west) {Mode 3:};
+        \node[mode label] at (m-2-2.north west) {Mode 4:};
+
+        % Row 3 Labels
+        \node[mode label] at (m-3-1.north west) {Mode 5:};
+        \node[mode label] at (m-3-2.north west) {Mode 6:};
+
+        % --- Add "Point 1" and "Point 15" Labels ---
+        % Point 1
+        \node[point label] (p1) at ($(m-1-1.north east) + (-1.5cm, -0.6cm)$) {Point 1};
+
+        % Point 15
+        \node[point label] (p15) at ($(m-1-1.south east) + (-1.5cm, 0.6cm)$) {Point 15};
+
+    \end{tikzpicture}
+\end{figure}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Keep the following \cleardoublepage at the end of this file, 
+% otherwise \includeonly includes empty pages.
+\cleardoublepage
+
+% vim: tw=70 nocindent expandtab foldmethod=marker foldmarker={{{}{,}{}}}

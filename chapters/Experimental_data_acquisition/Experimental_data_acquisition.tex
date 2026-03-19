@@ -1,0 +1,586 @@
+% !TeX root = ../../thesis.tex
+\chapter{Sensors and experimental data acquisition}\label{ch:Experimental_data_acquisition}
+
+
+\begin{enumerate}
+    \item this chapter is for
+\end{enumerate}
+
+
+
+\section{introduction to sensors and experimental data acquisition}
+\subsection{experimental data acuqisition for mechanical systems}
+\subsection{Description of sensors}
+
+\begin{enumerate}
+    \item general stuff about experimental data acquisition, the goals of experimental identification (for uncertainty quantification, model updating, sensor model upating, boundary condition identification)
+    \item first section introducing sensors
+    \item \begin{enumerate}
+              \item Accelerometers (influence of accelerometer cables on damping)
+              \item Strain gauges
+              \item FOS
+              \item Temperature sensors
+          \end{enumerate}
+    \item the goals of experimental identification (for uncertainty quantification, model updating, sensor model upating, boundary condition identification)
+\end{enumerate}
+
+\section{Experimental investigation on the influence of sensor cables on modal parameters}
+
+\subsection{Introduction}
+
+Assessing the degree to which a model represents the real-world component or setup is a crucial step in creating high fidelity models. Component or system level models are often fine-tuned and sometimes drastically changed in the model updating procedure, thanks to the information provided by the measurements. Simplifying assumptions considered within the model are inconsequential to the measurement signals, and these measurements provide the ground truth on which the model can be built. As such, eliminating any source of error and uncertainty in the measurements is of great significance.
+
+Measurements can be divided into contact and non-contact categories. In contact measurement methods the transducers are placed on the structure, and traditionally the influence of these transducers is considered negligible. However, collecting experimental data while studying the dynamic behavior of lightweight structures may result in incorrect readings if the impact of the accelerometer mass is not considered during the \gls{frf} analysis. This effect is known as “mass loading” and it could lead to a flawed interpretation of both the experimental results and theoretical simulations. One study proposes a sequential measurement approach in order to cancel the mass loading effect \cite{silva_cancellation_2000} . In another study \cite{cakar_elimination_2005} the authors use the Sherman-Morrison formula to calculate the mass loading effect. This formula provides an efficient method of performing the inversion of a modified matrix, given the availability of the inverted original (unperturbed) matrix. Another study \cite{zhu_removing_2019} utilized the Sherman-Morrison formula as well, further improving the computational requirements. Looking at the problem of machining chatter, researchers \cite{ozsahin_analysis_2010} focused on the mass loading effect on tool point \gls{frf} measurements, as the weight ratio between the accelerometer and the tool can be high enough to lead to instabilities due to mass loading errors. While focusing on transducer mass loading during shaker modal tests, researchers \cite{bi_elimination_2013} included a method for taking into account the mass loading of the force transducer at shaker connection. Bi et al. also utilized \glspl{ldv} for validation. The accuracy of \gls{ldv} measurements for modal analysis is established in the literature and has been investigated and approved in many studies \cite{warren_comparison_2011}.
+
+In all of the aforementioned studies, the influence of transducer cables is somehow controlled or limited. For instance, Zhu et al. validated their approach by comparing dynamic response of a structure in two cases: in the first case the accelerometers were attached to the structure using an 8 gram connection, and in the second case the accelerometers were connected using a 28 gram connection. As a result, the impact of the cables was neglected.
+
+Part of the contribution of cables to measurement inaccuracies can be considered as additional mass attached to the structure. This has led some researchers to weigh the contributing length of the cable with the accelerometer in their mass loading calculations \cite{kiran_compensation_2017}. Apart from the mass contribution of the cables, they can also impact the structure by adding damping to the system. Models of cables and their internal damping mechanisms have long been a research interest \cite{spak_cable_2013}, with most of the studies being focused on axially tensioned cables. Despite the availability of some models for non-axially loaded curved cables and their damping \cite{otrin_damped_2007}, these methods are costly and approximative and this has led some studies to use lumped damping representations \cite{kiran_compensation_2017,olvera_improved_2016}. The aforementioned studies investigate the influence of accelerometer and their cables on measured workpiece \glspl{frf}, in order to gauge and improve stability during machining operations such as milling. In these studies the workpiece is fixed.
+
+The purpose of this study is to provide an experimental assessment on the influence of accelerometers and their cables on modal properties of lightweight and lightly-damped structures, with a focus on modal damping coefficients which has not been widely addressed in the current literature. Moreover, unlike other contributions the structure in this study is an aluminum plate in free-free boundary condition, which introduces a higher amplitude of motion in the structure, possibly leading to higher impact from the accelerometer cables. \gls{ldv} measurements are used to provide the measurement data.
+
+After an introduction to the experimental setup and the \gls{fe} model of it, in Part A of the results the modal parameters (frequency and damping coefficients) are extracted for multiple cases of accelerometer connections, establishing the impact of the cables. In Part B a model is proposed accounting for their influence, with a focus on model simplicity. The limitation of the model and possible reasons for inaccuracies are discussed. Finally, recommendations for improving the model are offered.
+
+\subsection{Experimental setup and FEM}
+
+The experimental setup shown in \cref{fig:S4_ExperimentalSetup} consists of a 297 by 210 mm aluminum plate with a thickness of 2.55 mm in free-free boundary condition, excited using an automatic modal hammer (Maul-Theet VLMPACT-60), while two accelerometers are placed on the structure. At the same time, two Laser Doppler Vibrometers (Polytec PSV  500, Polytec OFV 2200) measure the dynamics exactly at the location of accelerometers, using reflective tapes places on top of them. The accelerometers were only placed on the plate in order to investigate their influence using \glspl{ldv}, and measurements with accelerometers were not considered for this work.
+
+\begin{figure}[htp]
+    \centering
+    \tabskip=0pt
+    \valign{#\cr
+        \hbox{%
+            \begin{subfigure}[b]{.58\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{Setup with LDVs.jpeg}
+                \caption{Suspended plate with \glspl{ldv} measuring at the location of two accelerometers.}
+            \end{subfigure}%
+        }\cr
+        \noalign{\hfill}
+        \hbox{%
+            \begin{subfigure}{.38\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{sensor locations.jpg}
+                \caption{Location of the two points on the plate where the accelerometers are placed.}
+            \end{subfigure}%
+        }\vfill
+        \hbox{%
+            \begin{subfigure}{.38\textwidth}
+                \centering
+                \includegraphics[width=\textwidth,trim={0 0 0 5cm},clip]{Two accelerometers.jpeg}
+                \caption{The two types of accelerometers used in the experiments.}
+                \label{fig:S4_ExperimentalSetup_c}
+            \end{subfigure}%
+        }\cr
+    }
+    \caption[Experimental setup]{Experimental setup, location of the measurement points on the plate and types of accelerometers used. The \glspl{ldv} enable the measurement of the plate dynamics even when the cables are detached.}
+    \label{fig:S4_ExperimentalSetup}
+\end{figure}
+
+A representative \gls{fe} model of the plate consisting of 11388 quadratic hexahedral elements was created. Having done an \gls{ema} using impact hammers on the full grid of the plate shown in \cref{fig:S4_ExperimentalSetup}, mode shapes and frequencies of the first 6 modes were extracted using \gls{ldv} measurements. The model was updated using the data from EMA, and experimental modal damping values representing material damping were added to the \gls{fe} model. Experimental and updated model modal parameters, as well as their correlation via \gls{mac}  and frequency errors are provided in \cref{tab:S4_modalPropertiesAndCorrelation}.
+
+Throughout this study, the influence of accelerometers and their cables are investigated by looking at modal parameters. To this end, the \gls{mor} method of modal truncation was used, which reduced the dimension of the model from 349932 Degrees of Freedom to 6, representing the first 6 dynamic modes as shown in \cref{tab:S4_modalPropertiesAndCorrelation}. The corresponding modeshapes to these modes are provided in \cref{ch:myappendix4}.
+
+\begin{table}[htp]
+    \centering
+    \caption[Modal properties of the plate and its updated \gls{fe} model]{Modal properties of the plate and the updated \gls{fe} model of it. The model shows good correlation with the experimental results.}
+    \label{tab:S4_modalPropertiesAndCorrelation}
+    \renewcommand{\arraystretch}{1.2} % Adds a little vertical padding for readability
+    \begin{tabular}{cccccd{2.3}}
+        \hline
+        \makecell{Mode                                 \\ number} &
+        \makecell{Freq.                                \\ {[}Hz{]}} &
+        \makecell{Exp. Freq.                           \\ {[}Hz{]}} &
+        \makecell{Exp. Modal damping                   \\ coefficient} &
+        MAC &
+        % \makecell{Freq. error                          \\ \%} \\
+        \multicolumn{1}{c}{\makecell{Freq. error       \\ \%}} \\
+        \hline
+        1   & 129.7 & 130.9 & 2.17e-4 & 1.000 & 0.925  \\
+        2   & 151.4 & 150.1 & 3.23e-4 & 1.000 & -0.859 \\
+        3   & 306.9 & 307.2 & 1.36e-4 & 0.999 & 0.098  \\
+        4   & 315.7 & 315.6 & 5.86e-4 & 0.998 & -0.032 \\
+        5   & 385.6 & 384.4 & 1.59e-4 & 0.995 & -0.311 \\
+        6   & 456.0 & 453.4 & 2.09e-4 & 1.000 & -0.570 \\ \hline
+    \end{tabular}
+\end{table}
+
+The experiment was carried out for five cases of accelerometers being attached to the plate. These cases can be viewed in \cref{fig:S4_casesOfExperimentalSetup} and they are labelled with two digits. The first digit provides information for point 1, while the second digit refers to point 15. Regarding the digits values, “0” indicates the absence of any accelerometer or cable, “1” indicates the presence of only the accelerometer without any cable attached and “2” indicates that both the accelerometer and its cable are attached to the point.
+
+\begin{figure}[htp]
+    \centering
+    \begin{tikzpicture}[scale=0.30,
+            % --- Define Styles ---
+            % Style for the blue rectangular plate
+            plate/.style={
+                    fill=cyan!70!blue!80!white,
+                    draw=cyan!40!blue,
+                    line width=1pt,
+                    minimum width=4cm,
+                    minimum height=2cm,
+                    outer sep=0
+                },
+            % Style for the orange accelerometer circles
+            accel/.style={
+                    circle,
+                    fill=orange!90!white,
+                    draw=orange!80!black,
+                    line width=1pt,
+                    inner sep=4pt
+                },
+            % Style for the yellow 'X' marker
+            noaccel/.style={
+                    draw=yellow,
+                    line width=2pt,
+                    line cap=round
+                },
+            % Style for the wavy cables
+            cable/.style={
+                    draw=black,
+                    line width=1.2pt,
+                    decorate,
+                    decoration={snake, amplitude=1.5pt, segment length=7pt, post length=2pt}
+                },
+            % Style for labels
+            point label/.style={
+                    font=\footnotesize\itshape,
+                    text=white
+                },
+            caption label/.style={
+                    font=\normalsize,
+                    below=0.3cm,
+                    align=center,
+                    text width=6cm
+                },
+            dashed line/.style={
+                    draw=cyan!70!blue!60!white,
+                    dashed,
+                    line width=2pt
+                }
+        ]
+
+        % --- Define Macro to draw a single case ---
+        \newcommand{\drawcase}[7]{
+            % Draw the plate node
+            \node[plate] (#1) at #2 {};
+
+            % Draw dashed vertical lines
+            \draw[dashed line] ($(#1.north west)+(0.8,0)$) -- ++(0,1.2);
+            \draw[dashed line] ($(#1.north east)+(-0.8,0)$) -- ++(0,1.2);
+
+            % Define coordinates
+            \coordinate (p15_#1) at ($(#1.north west)+(+2,-1.1)$);
+            \coordinate (p1_#1) at ($(#1.south east)+(-2,1.1)$);
+
+            % --- FIX: Use \ifstrequal instead of \ifdefstring ---
+
+            % Draw marker at Point 15
+            \ifstrequal{#3}{accel}{
+                \node[accel] at (p15_#1) {};
+            }{}
+            \ifstrequal{#3}{noaccel}{
+                \draw[noaccel] ($(p15_#1)+(-0.2,-0.2)$) -- ($(p15_#1)+(0.2,0.2)$);
+                \draw[noaccel] ($(p15_#1)+(-0.2,0.2)$) -- ($(p15_#1)+(0.2,-0.2)$);
+            }{}
+
+            % Draw marker at Point 1
+            \ifstrequal{#4}{accel}{
+                \node[accel] at (p1_#1) {};
+            }{}
+            \ifstrequal{#4}{noaccel}{
+                \draw[noaccel] ($(p1_#1)+(-0.2,-0.2)$) -- ($(p1_#1)+(0.2,0.2)$);
+                \draw[noaccel] ($(p1_#1)+(-0.2,0.2)$) -- ($(p1_#1)+(0.2,-0.2)$);
+            }{}
+
+            % Draw labels
+            \node[point label, below=5pt] at (p15_#1) {Point 15};
+            \node[point label, left=5pt] at (p1_#1) {Point 1};
+
+            % Draw measurement cables
+            \ifstrequal{#5}{yes}{
+                \draw[cable] (p15_#1) to[out=95, in=260] ++(0.3, 2);
+            }{}
+            \ifstrequal{#6}{yes}{
+                \draw[cable] (p1_#1) to[out=5, in=175] ++(2.4, -0.3);
+            }{}
+
+            % Add the caption
+            \node[caption label] at (#1.south) {#7};
+        }
+
+        % --- Main Content ---
+        % Top Case (2-2)
+        \drawcase{c22}{(0,0)}{accel}{accel}{yes}{yes}{Case 2-2: Accelerometers \checkmark \\ cables at points 1 and 15 \checkmark}
+
+        % Middle Row
+        \drawcase{c11}{($(c22.south west)+(-2,-9.5)$)}{accel}{accel}{no}{no}{Case 1-1: Accelerometers \checkmark \\ cables \crossmark}
+        \drawcase{c00}{($(c22.south east)+(2,-9.5)$)}{noaccel}{noaccel}{no}{no}{Case 0-0: Accelerometers \crossmark \\ cables \crossmark}
+
+        % Bottom Row
+        \drawcase{c12}{($(c11.south)+(0,-9.5)$)}{accel}{accel}{yes}{no}{Case 1-2: Accelerometers \checkmark \\ cable at point 15 \checkmark}
+        \drawcase{c21}{($(c00.south)+(0,-9.5)$)}{accel}{accel}{no}{yes}{Case 2-1: Accelerometers \checkmark \\ cable only at point 1 \checkmark}
+
+        \coordinate (bottom center) at ($(c12.south)!0.5!(c21.south)$);
+    \end{tikzpicture}
+    \caption[Cases for experimental setup]{Different configurations of the experimental setup are investigated.}
+    \label{fig:S4_casesOfExperimentalSetup}
+\end{figure}
+
+In addition, all cases were carried out using 2 sets of different accelerometers, seen in \cref{fig:S4_ExperimentalSetup_c}:
+\begin{itemize}
+    \item Two uniaxial PCB 352A24 accelerometers with their corresponding lightweight cable
+    \item Two triaxial PCB 356A15 accelerometers with their corresponding cable.
+\end{itemize}
+
+These two different accelerometer types were selected because of the difference in their respective weight, as well as the properties of their cables. Even though the manufacturer provides the datasheet of the accelerometers, not much is available with regards to the properties of the cables, and they seem to differ greatly in material properties. The weight of the cables was measured as done in a previous study \cite{kiran_compensation_2017}. The weight of both accelerometer types and their respective cables are provided in \cref{tab:S4_accelerometerAndCableProperties}. \todo{use SIunits package and change the gram below to use SIunits}
+
+\begin{table}[htp]
+    \centering
+    \caption[Properties of the accelerometers and their cables]{Properties of the accelerometers and their cables used in the experimental setup.}
+    \label{tab:S4_accelerometerAndCableProperties}
+    \renewcommand{\arraystretch}{1.2} % Adds a little vertical padding for readability
+    \begin{tabular}{ccc}
+        \hline
+        \makecell{Accelerometer type}   &
+        \makecell{Weight without cable} &
+        \makecell{Weight of the cable (100 cm            \\ at the accelerometer side)} \\
+        \hline
+        Uniaxial (352A24)               & 0.8 g & 10.5 g \\
+        Triaxial (356A15)               & 3.1 g & 12.3 g \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\subsection{Results: Part A}
+
+Prior to looking at the results, it is important to investigate the variability of modal parameters based on how the accelerometer cables are attached to the support structure. This influence has been mentioned in similar studies \cite{kiran_compensation_2017,olvera_improved_2016} without providing experimental assessment. Another study \cite{smith_determining_2020} investigated the impact of uniaxial accelerometer cable attachments above, below or on the same height as the structure under test and found no meaningful difference. In this study, the assessment is done for triaxial accelerometers in 2-2 case, as their cables have a higher influence on the dynamics of the plate. The results can be seen in \cref{fig:S4_sdvOfModalParameters}. These results are generated after four different methods were used to attach the accelerometer cable of point 1 to the support structure (\cref{fig:S4_ExperimentalSetup}). The standard deviation of modal parameters are presented. It should be noted that although the four attachments varied in direction, orientation and cable slack, they were all valid attachments. The results can be seen in \cref{fig:S4_sdvOfModalParameters}. The average of standard deviation of modal frequencies was 0.55 Hz, and the same for modal damping coefficients was 1.6e-3.
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=.9\textwidth]{Figure_sdvOfModalParameters20251217_192404.pdf}
+    \caption[standard deviation of modal parameters]{Standard deviation of modal parameters after changing the attachment of point 1 accelerometer cable at the hanging point of the cable (2-2 case, 3D). The attachment approach affects the modal parameters, and it does so differently for each mode.}
+    \label{fig:S4_sdvOfModalParameters}
+\end{figure}
+
+After accounting for different attachments that could introduce errors and uncertainties in the measurements, we can take a look at the experimental results. \Cref{fig:S4_measModalParamDiffs1D3D} provides the results in different cases using both uniaxial and triaxial accelerometers (with their respective cables). Considering modal frequencies, the bare plate (case 0-0) is considered as reference. Modal damping values of the bare plate are rather constant among modes \((1.3e-4< \damping_i <5.8e-4)\), and this is expected since the material damping is the main dissipation mechanism and the aluminum loss factor is found almost constant in the considered frequency range \cite{gallas_influence_2023,zoghaib_damping_2013}. Looking at the difference between 1D and 3D measurements, it can be noticed that there is roughly an order of magnitude difference between the amplitudes, both in the case of modal damping and modal frequencies. We can also observe that with regard to modal frequencies, on both 1D and 3D cases modes 1,3 and 6 are more influenced by the addition of accelerometers and their cables. It can also be observed that the addition of the cable at point 15 (comparing cases 1-1 and 1-2) does not contribute to an increase in modal frequencies, other than minor contributions to modes 6 and less so to mode 1. This can be further recognized by looking at the difference between cases 2-1 and 2-2, especially for the 3D accelerometers for which the “information to noise” ratio is higher. In contrast to this, the cable attached to the accelerometer located at point 1 impacts the modal frequencies to a much higher degree. This can be observed either by looking at the difference between cases 1-1 and 2-1, or the difference between 1-2 and 2-2.
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=.99\textwidth]{Figure_measModalParamDiffs1D3D20251219_114429.pdf}
+    \caption[Measured modal parameters of different cases]{Measured modal parameters for different cases of accelerometer and cable attachments, for uniaxial and triaxial accelerometers. Top: Uniaxial accelerometers and cables, Bottom: Triaxial accelerometers and cables. Triaxial accelerometers and their cables have a higher influence on the modal parameters.}
+    \label{fig:S4_measModalParamDiffs1D3D}
+\end{figure}
+
+With regard to modal damping, for both 1D and 3D cases, a high influence on modes 1 and 6 can be seen, while mode 3 has a higher increase for 3D cases in comparison to 1D. Considering the bare plate (0-0 case), mode 4 has the highest damping coefficient and shows a very low sensitivity after the addition of accelerometers and cables. Looking at modeshapes (\cref{ch:myappendix4}) , we can see that highest amplitude of displacement for mode 4 appears at the location of suspension cables. The authors believe this to be the reason for higher damping coefficient of this mode, as the suspension mechanism is a well-known source of energy dissipation in free-free structures \cite{zoghaib_damping_2013}. Similar to modal frequencies, we observe a lower influence from the cable at point 15.
+
+Looking at the 6th modeshape in \cref{ch:myappendix4}, it can be observed that the location of both accelerometers has approximately the same level of modal displacement, which is in contrast to other modes. The authors believe this to be the reason of high influence of all cases on mode 6 which can be seen on all plots of \cref{fig:S4_measModalParamDiffs1D3D}, whether on modal damping coefficients or modal frequencies. Despite similar modal displacement levels on mode 4, the authors believe the influence of suspension cables to be the reason for low impact from both cables and measurements. The low sensitivity of mode 4 and the influence of suspension cable on it is a point of interest on which further research should be conducted.
+
+\subsection{Results: Part B}
+
+\Cref{fig:S4_measModalParamDiffs1D3D} enabled us to visualize the level of influence the accelerometer cables have on the measured modal properties of a structure. Because of this, the authors propose a model considering the damping caused by the cables, as well as the mass loading effect. Considering a discretized mechanical system with \(\numStates\) \glspl{dof} and stiffness, mass and damping matrices of \(\stiffMat,\massMat,\dampingMat \in \realSet^{\numStates \times \numStates}\) the following dynamic equation holds:
+\begin{align}
+    \selectionMatForce \forceVec (t) = \massMat \ddot{\displacementVec}(t) + \dampingMat \dot{\displacementVec}(t) + \stiffMat \displacementVec (t),
+\end{align}
+in which the force exerted on the system is represented by the multiplication \(\selectionMatForce \forceVec (t)\), with \(\forceVec (t) \in \realSet^{\numInputLoads}\) representing the vector of input loads, \(\numInputLoads\) representing the number of input loads and \(\selectionMatForce \in \realSet^{\numStates \times \numInputLoads}\) being the input selection matrix, while \(\displacementVec(t) \in \realSet^{\numStates}\) is the vector of displacements. This system of equations can be reduced to the desired number of generalized coordinates \(\numRedStates\) (\(\numRedStates \ll \numStates \)) using the following projection:
+\begin{align}
+    \displacementVec (t) & \approx \reductionMat \genDispVec (t),
+\end{align}
+in which \(\reductionMat \in \realSet^{\numStates \times \numRedStates}\) is the reduction basis and \( \genDispVec \in \realSet^{\numRedStates} \) represents the vector of generalized coordinates. The reduction basis \( \reductionMat \), which is typically mass-normalized, is generally a combination of normal vibration modes and other desired modes such as attachment modes and inertia-relief modes. The basis is usually generated through operations such as eigenvalue analysis and singular value decomposition \cite{besselink_comparison_2013}. As a result of this projection, the reduced system matrices can be defined as:
+\begin{align}
+    \massMatRed    & = \reductionMat^\intercal \massMat \reductionMat    \\
+    \dampingMatRed & = \reductionMat^\intercal \dampingMat \reductionMat \\
+    \stiffMatRed   & = \reductionMat^\intercal \stiffMat \reductionMat,
+\end{align}
+where \(\massMatRed,\dampingMatRed,\stiffMatRed \in \realSet^{\numRedStates \times \numRedStates}\). Similarly, the reduced input selection matrix is formulated as:
+\begin{align}
+    \selectionMatForceRed & = \reductionMat^\intercal \selectionMatForce,
+\end{align}
+where \( \selectionMatForceRed \in \realSet^{\numRedStates \times \numInputLoads} \) is the reduced input selection matrix.
+
+Using the above reduced system matrices, the dynamic equation can be re-written, in time and frequency domain:
+\begin{align}
+    \selectionMatForceRed \forceVec (t)         & = \massMatRed \ddot{\genDispVec}(t) + \dampingMatRed \dot{\genDispVec}(t) + \stiffMatRed \genDispVec (t), \\
+    \selectionMatForceRed \forceVecFreq (\freq) & = \left( -\freq^2 \massMatRed + i \freq \dampingMatRed + \stiffMatRed \right) \genDispVecFreq (\freq),
+    \label{eq:S4_eomInFreqDomain}
+\end{align}
+in which \(\forceVecFreq (\freq) \in \complexSet^{\numInputLoads}\) and \(\genDispVecFreq (\freq) \in \complexSet^{\numRedStates}\) represent the force vector and generalized displacement vector in frequency domain, respectively:
+\begin{align}
+    \forceVec (t) \fourierTransform \forceVecFreq (\freq), \\
+    \genDispVec (t) \fourierTransform \genDispVecFreq (\freq).
+\end{align}
+In the equations above, \(\fourierTransform\) shows the forward and inverse Fourier transforms, and \(\freq\) denotes the frequency.
+
+Looking at \cref{eq:S4_eomInFreqDomain}, the transfer function is defined as:
+\begin{align}
+    \TransferFunc (\freq) & = \left( -\freq^2 \massMatRed + i \freq \dampingMatRed + \stiffMatRed \right)^{-1}.
+\end{align}
+
+For the bare plate, the mass and stiffness matrices can be extracted from the \gls{fe} model. The damping matrix on the other hand is constructed using the experimental modal damping coefficients:
+\begin{equation}
+    \dampingMatRed[,ij]  =
+    \left\{
+    \begin{aligned}
+        2 \naturalFreq[,i] \damping_{i} & \quad \text{if } i = j    \\
+        0                               & \quad \text{if } i \neq j
+    \end{aligned}
+    \right.
+\end{equation}
+
+
+In the above equation, \(\naturalFreq[,i]\) and \(\damping_{i}\) represent the natural frequency and modal damping coefficient of mode \(i\), respectively, resulting in a diagonal reduced damping matrix. \todo{include how here we only have the dampiong ratio for normal modes from EMA, and for other modes (static modes for example) due to re-orthonormalization it's not a known quantity. We investigate this briefly in the other chapter}
+
+In order to account for the mass loading of the accelerometers, a lumped mass is considered at the location of the accelerometers. Similarly, a lumped damper is considered at the same location in order to account for the damping of the cables. These lumped parameters are added to the experimentally updated \gls{fe} model of the bare plate. \Cref{fig:S4_modelledAccelemetersAndCables} provides a schematic for the proposed model.
+
+\begin{figure}[htp]
+    \centering
+    \begin{tikzpicture}[scale=0.30,
+            % --- Define Styles ---
+            plate/.style={
+                    fill=cyan!70!blue!80!white,
+                    draw=cyan!40!blue,
+                    line width=1pt,
+                    minimum width=4cm,
+                    minimum height=2cm,
+                    outer sep=0
+                },
+            accel/.style={
+                    circle,
+                    fill=orange!90!white,
+                    draw=orange!80!black,
+                    line width=1pt,
+                    inner sep=4pt
+                },
+            noaccel/.style={
+                    draw=yellow,
+                    line width=2pt,
+                    line cap=round
+                },
+            cable/.style={
+                    draw=black,
+                    line width=1.2pt,
+                    decorate,
+                    decoration={snake, amplitude=1.5pt, segment length=7pt, post length=2pt}
+                },
+            % --- MECHANICAL ELEMENTS STYLES ---
+            mech line/.style={
+                    draw=black,
+                    line width=1pt,
+                    line cap=round
+                },
+            mech label/.style={
+                    font=\small,
+                    text=black
+                },
+            % --- NEW BOUNDARY LINE STYLE ---
+            boundary line/.style={
+                    draw=black,
+                    line width=1pt,
+                    postaction={
+                            decorate,
+                            decoration={
+                                    markings,
+                                    mark=between positions 0 and 1 step 6pt with {
+                                            \draw[line width=0.8pt] (0pt,0pt) -- (3pt,3pt);
+                                        }
+                                }
+                        }
+                },
+            % ----------------------------------
+            point label/.style={
+                    font=\footnotesize\itshape,
+                    text=white
+                },
+            caption label/.style={
+                    font=\normalsize,
+                    below=0.3cm,
+                    align=center,
+                    text width=6cm
+                },
+            dashed line/.style={
+                    draw=cyan!70!blue!60!white,
+                    dashed,
+                    line width=2pt
+                }
+        ]
+
+        % --- Define Macro ---
+        \newcommand{\drawcase}[7]{
+            % Draw the plate node
+            \node[plate] (#1) at #2 {};
+
+            % Draw dashed vertical lines
+            \draw[dashed line] ($(#1.north west)+(0.8,0)$) -- ++(0,1.2);
+            \draw[dashed line] ($(#1.north east)+(-0.8,0)$) -- ++(0,1.2);
+
+            % Define coordinates for points
+            \coordinate (p15_#1) at ($(#1.north west)+(+2,-1.1)$);
+            \coordinate (p1_#1) at ($(#1.south east)+(-2,1.1)$);
+
+            % Draw markers
+            \ifstrequal{#3}{accel}{\node[accel] at (p15_#1) {};}{}
+            \ifstrequal{#3}{noaccel}{
+                \draw[noaccel] ($(p15_#1)+(-0.2,-0.2)$) -- ($(p15_#1)+(0.2,0.2)$);
+                \draw[noaccel] ($(p15_#1)+(-0.2,0.2)$) -- ($(p15_#1)+(0.2,-0.2)$);
+            }{}
+
+            \ifstrequal{#4}{accel}{\node[accel] at (p1_#1) {};}{}
+            \ifstrequal{#4}{noaccel}{
+                \draw[noaccel] ($(p1_#1)+(-0.2,-0.2)$) -- ($(p1_#1)+(0.2,0.2)$);
+                \draw[noaccel] ($(p1_#1)+(-0.2,0.2)$) -- ($(p1_#1)+(0.2,-0.2)$);
+            }{}
+
+            % Draw labels for points
+            \node[point label, below=5pt] at (p15_#1) {Point 15};
+            \node[point label, left=5pt] at (p1_#1) {Point 1};
+
+            % --- CONNECTIONS AT POINT 15 (Vertical Damper) ---
+            \ifstrequal{#5}{yes}{
+                \draw[cable] (p15_#1) to[out=95, in=260] ++(0.3, 2);
+            }{}
+            \ifstrequal{#5}{damper}{
+                % Mass label
+                \node[mech label, right, xshift=0.3cm, yshift=0cm] at (p15_#1) {m15};
+
+                % 1. Support Position Calculation
+                \path (#1.north west) ++(0,3.5) coordinate (temp_top);
+                \coordinate (c15_support_pt) at (p15_#1 |- temp_top);
+
+                % Draw support line
+                \draw[boundary line] ($(c15_support_pt)+(-1.0,0)$) -- ($(c15_support_pt)+(1.0,0)$);
+
+                % Draw Vertical Damper c15
+                \begin{scope}[mech line]
+                    % 2. PISTON ROD (Manipulation Point)
+                    % CHANGE THE '2.5' BELOW TO MOVE DAMPER UP OR DOWN
+                    \draw (p15_#1) -- ++(0, 2.5) coordinate (c15_piston_h); %%% <--- CHANGED TO 2.5
+
+                    % Draw Piston head
+                    \draw ($(c15_piston_h)+(-0.3,0)$) -- ($(c15_piston_h)+(0.3,0)$);
+
+                    % Draw Cup (relative to piston head)
+                    \coordinate (c15_cup_bott) at ($(c15_piston_h)+(0,-0.6)$);
+                    \draw ($(c15_cup_bott)+(-0.4,0)$) -- ++(0, 1.5) -- ++(0.8,0) -- ++(0,-1.5);
+
+                    % Draw connection from cup to support
+                    \draw ($(c15_cup_bott)+(0,1.5)$) -- (c15_support_pt);
+                \end{scope}
+                % Damper label
+                \node[mech label, right, xshift=0.3cm] at ($(c15_piston_h)+(0,0.3)$) {c15};
+            }{}
+
+            % --- CONNECTIONS AT POINT 1 (Horizontal Damper) ---
+            \ifstrequal{#6}{yes}{
+                \draw[cable] (p1_#1) to[out=5, in=175] ++(2.4, -0.3);
+            }{}
+            \ifstrequal{#6}{damper}{
+                % Mass label
+                \node[mech label, above, xshift=0cm, yshift=0.3cm] at (p1_#1) {m1};
+
+                % 1. Support Position Calculation
+                \path (#1.east) ++(5.0,-2) coordinate (temp_right); % Slightly further out for room
+                \coordinate (c1_support_x) at (temp_right);
+
+                % Draw support line
+                \draw[boundary line] ($(c1_support_x)+(0,1.2)$) -- ($(c1_support_x)+(0,-1.2)$);
+
+                % Draw Horizontal Damper c1
+                \begin{scope}[mech line]
+                    % 2. PISTON ROD (Manipulation Point)
+                    % CHANGE THE '3.5' BELOW TO MOVE DAMPER LEFT OR RIGHT
+                    \draw (p1_#1) -- ++(3.5, 0) coordinate (c1_piston_v); %%% <--- CHANGED TO 3.5
+
+                    % Piston head
+                    \draw ($(c1_piston_v)+(0,-0.3)$) -- ($(c1_piston_v)+(0,0.3)$);
+
+                    % Cup
+                    \coordinate (c1_cup_left) at ($(c1_piston_v)+(-0.6,0)$);
+                    \draw ($(c1_cup_left)+(0,-0.4)$) -- ++(1.5, 0) -- ++(0,0.8) -- ++(-1.5,0);
+
+                    % Connection to support
+                    \draw ($(c1_cup_left)+(1.5,0)$) -- (c1_support_x |- p1_#1);
+                \end{scope}
+                % Damper label
+                \node[mech label, above, xshift=0cm, yshift=0.3cm] at (c1_piston_v) {c1};
+            }{}
+
+            % Add the caption
+            \node[caption label] at (#1.south) {#7};
+        }
+
+        % --- Call the macro ---
+        \drawcase{c22}{(0,0)}{accel}{accel}{damper}{damper}{}
+
+    \end{tikzpicture}
+    \caption[Modelled accelerometers and cables]{The influence of accelerometers and their cables is modelled using lumped masses and dampers at their respective locations.}
+    \label{fig:S4_modelledAccelemetersAndCables}
+\end{figure}
+
+Point masses are added such that the new mass matrix is as follows:
+\begin{align}
+    \massMatRed' & = \massMatRed + \reductionMat^\intercal \massMatAug \reductionMat , \quad \massMatAug= \diag{\bm{m_p}} \in \realSet^{\numStates \times \numStates}.
+\end{align}
+In the above equation, \(\bm{m_p} \in \realSet^{\numStates}\) is the vector of point masses, having a value of zero at all entries exept where a point mass is added. As a result, \(\massMatRed'\) is the reduced mass matrix after the addition of the point masses, and the number of non-zero entries of the \(\massMatAug\) matrix is equal to the number of accelerometers \todo{due to one point mass being associated to multiple DOFs, I should rephrase this (and the next paragraph about damping)} attached to the structure, and the non-zero entries are located at the \glspl{dof} corresponding to the location of the accelerometers.
+
+In a similar manner, point dampers are added to the system using the following equation:
+\begin{align}
+    \dampingMatRed' & = \dampingMatRed + \diag{\bm{\naturalFreq[]}} \reductionMat^\intercal \dampingMatAug \reductionMat , \quad \dampingMatAug=\diag{\bm{c_p}} \in \realSet^{\numStates \times \numStates},
+\end{align}
+in which \( \bm{c_p} \in \realSet^{\numStates} \) is the vector of point damper coefficients, having a value of zero at all entries exept where a point damper is added. As a result, \(\dampingMatRed'\) is the reduced damping matrix after the addition of the point dampers. Similar to \(\massMatAug\), the number of non-zero entries of the \(\dampingMatAug\) matrix is equal to the number of accelerometers attached to the structure, and the non-zero entries are located at the \glspl{dof} corresponding to the location of the accelerometers. The multiplication by \(\diag{\bm{\naturalFreq[]}}\) is done in order to account for the frequency-dependency of damping, as it is observed that this model is more representative of the experimental results. \todo{go deeper in reasoning for frequency-dependency of the damping, and the unit of it} \todo{use SI units}
+
+The procedure for obtaining the point mass and damping values and validating them is as follows:
+\begin{itemize}
+    \item The updated \gls{fe} model which has the same modal damping coefficient as the bare plate (0-0 case) and low frequency errors \cref{tab:S4_accelerometerAndCableProperties}, is augmented with point mass and dampers at the location of the accelerometers.
+    \item An optimization algorithm is performed which minimizes the \gls{mse} of the discrepancy between the augmented model and experimental results of the 2-2 case, in which the 3D accelerometers and their respective cables are attached to the plate. First the optimal values for \(m_i\) and then the values for \(c_i\) are found. This optimization is performed by comparing the modal parameters of the model and experimental results.
+    \item In order to validate these values, the performance of the augmented model in cases 2-1 and 1-2 is examined.
+\end{itemize}
+
+One of the advantages of the proposed method is that the inversion of the transfer function is done in the reduced space, which greatly reduces the computational costs, enabling a direct search optimization approach. The results can be viewed in \cref{fig:S4_diffAccFRF}, in which the velocity \gls{frf} of the 6th mode of the plate is presented. The measured \glspl{frf} in cases 0-0 and 2-2 are displayed in thicker lines, while thin dash-dotted lines represent the \glspl{frf} of the model, in different steps. Each step cumulatively augments the model with further elements: first the bare plate model is considered, then the transducer mass is added, next the mass of the transducer cable is included, and finally the damping of the sensor cable is considered. It should be noted that the line with the label 'Model with compensation for acc. mass' represents the common approach in the literature in which the mass of the accelerometer is read from the datasheet (\cref{tab:S4_accelerometerAndCableProperties}) and added to the model. As indicated in the graph, this approach leads to some level of inaccuracy on modal frequencies by not accounting for the cable mass, but the discrepancies caused by unaccounted damping of the cables are in relative terms higher.
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=.99\textwidth]{Figure_diffAccFRF_20260223_145337.pdf}
+    \caption[Influence of modelled sensor and cable effects on velocity \gls{frf} of a single mode]{The velocity \gls{frf} of the plate, focused around the frequency range of the sixth mode, presented both experimentally and with the proposed model in different levels of complexity. This figure particularly highlights the influence of sensor cables on modal damping of lightly damped structures, and shows the capacity of the proposed model to capture this influence.}
+    \label{fig:S4_diffAccFRF}
+\end{figure}
+
+Finally, after the point mass and damping values were calculated for the reference case 2-2, their validity is investigated using cases 2-1 and 1-2. The results for a new set of measurements can be viewed in \cref{fig:S4_validation1} and \cref{fig:S4_validation2}. The largest discrepancy is observed for mode 4 of the 1-2 case, in which the model predicts a higher modal damping. Similar to the results seen in \cref{fig:S4_measModalParamDiffs1D3D}, the authors believe the impact of the suspension cables to cause this discrepancy.
+
+
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=.99\textwidth]{Figure_validation120260220_143145.pdf}
+    \caption[First validation of the proposed model of sensor cables]{The performance of the proposed model for sensors and their cables is investigated using the first validation case (1-2) for 3D accelerometers. While the influence on modal frequencies is generally well-captured across all modes, the damping prediction shows an outlier on mode 4.}
+    \label{fig:S4_validation1}
+\end{figure}
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=.99\textwidth]{Figure_validation220260223_200712.pdf}
+    \caption[Second validation of the proposed model of sensor cables]{The performance of the proposed model for sensors and their cables is investigated using the second validation case (2-1) for 3D accelerometers. Similar to the first validation, the influence on modal frequencies is well-captured across all modes and the damping prediction, while being generally accurate, exhibits inaccurcies on modes 1 and 3.}
+    \label{fig:S4_validation2}
+\end{figure}
+
+As it can be observed in \cref{fig:S4_validation1} the model predicts the modal parameters rather well, as the average of the frequency percentage error (between the model and measurements) for all modes is 0.205 \%, and the average of modal damping coefficient error is 7.05e-4. The same can be observed for case 2-1 in \cref{fig:S4_validation2} since the average of the frequency percentage error is 0.284 \%, and the average of modal damping coefficient error is 2.21e-4.
+
+Besides the improvement on modal frequency predictions in comparison to classical mass loading practices as seen in \cref{fig:S4_diffAccFRF}, the model is also able to improve the accuracy on modal damping coefficients, particularly for the following modes:
+\begin{enumerate}
+    \item Mode 6 (case 1-2, \cref{fig:S4_validation1}): The model accurately predicts an increase in modal damping coefficient when considering the accelerometer and its cable at point 15, which is located on a high modal displacement position for that mode (\cref{ch:myappendix4}).
+    \item Modes 1 and 3 (case 2-1, \cref{fig:S4_validation2}): The model accurately predicts an increase in modal damping coefficient when considering the accelerometer and its cable at point 1, which, as it can be observed in \cref{fig:S4_measModalParamDiffs1D3D}, has a high influence on these modes.
+\end{enumerate}
+
+\subsection{Conclusions}
+In this paper the impact of accelerometers and their cables on modal properties of an aluminum plate in free-free boundary conditions was experimentally investigated. Using the contactless \gls{ldv} measurements, it was shown that the presence of accelerometers introduces a decrease on modal frequencies which depends on the type of accelerometers used and their location on the structure. In addition, the influence of accelerometer cable attachment on modal parameters was experimentally investigated. It was also shown that using only the weight of the accelerometers as indicated in their datasheet comes with a certain level of inaccuracy which needs to be accounted for. But with regard to modal damping coefficients, the disparity between the dynamic behavior of the model and experimental setup is larger. This inconsistency is the result of not accounting for the energy dissipation caused by accelerometer cables. The authors proposed a model which addresses this issue, and due to its lower computational effort can be run for large models using appropriate reduction methods.
+
+The authors acknowledge that the proposed model is simplifying and neglecting other mechanisms by which the energy dissipation occurs in the cables, but the intention of this study is to propose a simple and easy to implement method which proposes a lumped assumption on the damping. The authors motivate further research to be done on this topic in order to provide more insight. Two suggestions for additional investigation are:
+\begin{enumerate}
+    \item Inclusion of higher complexity lumped parameter models which are augmented with spring elements or nonlinear terms.
+    \item Repeated experiments on different structures in multiple clamping conditions for validation.
+\end{enumerate}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Keep the following \cleardoublepage at the end of this file, 
+% otherwise \includeonly includes empty pages.
+\cleardoublepage
+

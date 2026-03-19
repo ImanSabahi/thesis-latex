@@ -1,0 +1,45 @@
+% !TeX root = ../../thesis.tex
+\chapter{on time synchronization of data acquisition systems}\label[appendix]{ch:myappendix5}
+
+
+In this work, measurements were sometimes obtained simultaneously from two independent acquisition systems:
+\begin{enumerate}
+    \item \textbf{SCADAS system} recording most type of signals such as force cell outputs which record the input to the structure, shaft rotational speed generated from encoders, as well as acceleration and strain gauge responses.
+    \item \textbf{Fiber interrogator} recording the spectrum of the reflected light by the fiber. For most interrogators, an internal processing step detects the peaks of the spectrum (known as Bragg peaks for FBG sensors) and outputs the peak wavelength shift instead of the full spectrum at each time step, in order to decrease the data throuhput and enable higher sampling rates.
+\end{enumerate}
+
+Since the systems do not share a common trigger, direct time alignment of the two datasets is not possible. An automatic synchronization step is therefore required to enable meaningful comparison and joint analysis.
+
+\section*{Methodology}
+The adopted approach was based on the \textbf{cross-correlation} function. For finite discrete functions $f, g \in \mathbb{C}^N$, the cross-correlation is defined as:  
+
+\begin{equation}
+(f \star g)[n] \;\triangleq\; \sum_{m=0}^{N-1} \overline{f[m]}\, g\!\big[(m+n)_{\bmod N}\big],
+\end{equation}
+
+in which the index $n$ that maximises $f$ is 
+
+Practically, the SCADAS acceleration signal and the FBG wavelength shift were filtered around the excitation frequency of interest to increase robustness of the correlation. The signals were then resampled to a common sampling rate before computing the cross-correlation.
+
+\begin{figure}[htp]
+  \centering
+  \medskip
+  \includegraphics[width=.9\textwidth]{Figure_loadEstimForSynch20251217_104838.pdf}
+  \caption[illustration of synchronization]{An example of the result of the synchronization procedure. The measured signal (generated from the force cell) and the estimated signal (generated from the FBG sensor responses) show good temporal alignment.}
+  \label{fig:SNOIDEA_loadEstimForSynch}
+\end{figure}
+
+
+\section*{Results}
+The cross-correlation consistently yielded a clear maximum, enabling determination of the relative time shift with sub-sample accuracy. The FBG signals were then shifted accordingly, ensuring proper temporal alignment with the SCADAS measurements.
+
+This synchronization procedure is essential for subsequent analyses (e.g., frequency response estimation, mode shape comparison), where temporal coherence between both measurement systems is required. \cite{calvo-palomino_nanosecond-precision_2018}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Keep the following \cleardoublepage at the end of this file, 
+% otherwise \includeonly includes empty pages.
+\cleardoublepage
+
+% vim: tw=70 nocindent expandtab foldmethod=marker foldmarker={{{}{,}{}}}

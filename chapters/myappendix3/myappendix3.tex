@@ -1,0 +1,75 @@
+% !TeX root = ../../thesis.tex
+\chapter{Modeshapes of the beam setup}\label[appendix]{ch:myappendix3}
+
+
+
+
+
+\begin{figure}[htp]
+    \centering
+    \begin{tikzpicture}[
+            % Global font style
+            font=\sffamily,
+            % Style for the "Mode X:" labels
+            mode label/.style={
+                    anchor=north west,
+                    font=\normalsize\bfseries,
+                    inner sep=0pt, % Padding from the corner
+                    text=black
+                }
+        ]
+        \def\picwidth{5.5} % half length of each legend line sample
+
+        % --- Create the 3x2 Grid of Images ---
+        \matrix[
+            matrix of nodes,
+            nodes={
+                    inner sep=0pt,
+                    outer sep=0pt,
+                    anchor=center
+                },
+            column sep=0.5cm, % Horizontal gap between images
+            row sep=0.5cm,    % Vertical gap between images
+        ] (m) {
+            % --- Row 1 ---
+            \includegraphics[width=\picwidth cm]{mode 1.png} &
+            \includegraphics[width=\picwidth cm]{mode 2.png}          \\
+            % --- Row 2 ---
+            \includegraphics[width=\picwidth cm]{mode 3.png}        &
+            \includegraphics[width=\picwidth cm]{mode 4.png}          \\
+            % --- Row 3 ---
+            \includegraphics[width=\picwidth cm]{mode 5.png}        &
+            \includegraphics[width=\picwidth cm]{mode 6.png}          \\
+            % --- Row 4 ---
+            \includegraphics[width=\picwidth cm]{mode 7.png}        &
+            \includegraphics[width=\picwidth cm]{mode 8.png}          \\
+        };
+
+        % --- Add "Mode X:" Labels ---
+        % Row 1 Labels
+        \node[mode label] at (m-1-1.north west) {Mode 1, 25.66 Hz:};
+        \node[mode label] at (m-1-2.north west) {Mode 2, 36.28 Hz:};
+
+        % Row 2 Labels
+        \node[mode label] at (m-2-1.north west) {Mode 3, 44.70 Hz:};
+        \node[mode label] at (m-2-2.north west) {Mode 4, 70.19 Hz:};
+
+        % Row 3 Labels
+        \node[mode label] at (m-3-1.north west) {Mode 5, 94.32 Hz:};
+        \node[mode label] at (m-3-2.north west) {Mode 6, 135.2 Hz:};
+
+        % Row 4 Labels
+        \node[mode label] at (m-4-1.north west) {Mode 7, 138.20 Hz:};
+        \node[mode label] at (m-4-2.north west) {Mode 8, 149.0 Hz:};
+
+    \end{tikzpicture}
+\end{figure}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Keep the following \cleardoublepage at the end of this file, 
+% otherwise \includeonly includes empty pages.
+\cleardoublepage
+
+% vim: tw=70 nocindent expandtab foldmethod=marker foldmarker={{{}{,}{}}}

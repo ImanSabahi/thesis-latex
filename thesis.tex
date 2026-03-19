@@ -19,10 +19,10 @@
 % !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 %%% COVER: Settings %%%
-\title{The Title of Your PhD Dissertation}
+\title{Machine housing as a sensor in service to bearing force estimation}
 \subtitle{From Artes to AI}
 
-\author{Your}{Name}
+\author{Iman}{Sabahi}
 
 \supervisor{Prof.~dr.~ir.~F.~Leader}{}
 \supervisor{Prof.~dr.~ir.~S.~Leader}{}
@@ -33,7 +33,7 @@
 
 % Your research group within the department
 % e.g. DTAI, MICAS
-\researchgroup{XXXXX}
+\researchgroup{LMSD}
 \website{http://www.XXXXX.cs.kuleuven.be} % Leave empty to hide
 \email{first.last@cs.kuleuven.be} % Leave empty to hide
 
@@ -77,28 +77,59 @@
 
 %%% COVER: End settings %%%
 
-% for the nomenclature (comment out if you do not use the nomencl package
-\usepackage{nomencl}   % For nomenclature
+% --- GLOSSARIES SETUP ---
+\usepackage[prefix,acronym]{glossaries-extra} %This createds the acronym glossary
+\setabbreviationstyle[acronym]{long-short} 
+\newglossary[sym]{symbols}{syi}{syg}{List of Symbols}   % symbols glossary
+\makeglossaries
+% \newcommand{\s}{\gls} % shortcut for \gls{}
+
+% for the symbols/nomenclature
 \renewcommand{\nomname}{List of Symbols}
-\newcommand{\myprintnomenclature}{%
+\newcommand{\myprintsymbols}{%
   \cleardoublepage%
-  \printnomenclature%
-  \chaptermark{\nomname}
-  \addcontentsline{toc}{chapter}{\nomname} %% comment to exclude from TOC
+  \printglossary[type=symbols, title=\nomname, nonumberlist]%
+  \chaptermark{\nomname}%
+  \addcontentsline{toc}{chapter}{\nomname}%
 }
-\makenomenclature%
+
 
 % for the list of abbreviations (comment out if you do not use the glossaries package
-\usepackage{glossaries} % For list of abbreviations
 \newcommand{\glossname}{List of Abbreviations}
-\newcommand{\myprintglossary}{%
+\newcommand{\myprintabbreviations}{%
   \renewcommand{\glossaryname}{\glossname}
   \cleardoublepage%
-  \printglossary[title=\glossname]
+  \printglossary[type=\acronymtype, title=\glossname]
   \chaptermark{\glossname}
   \addcontentsline{toc}{chapter}{\glossname} %% comment to exclude from TOC
+  %Nathan: In case of issue later, try adding \phantomsection (maybe after clearcoublepage?)
 }
-\makeglossaries%
+%\makeglossaries%
+
+
+
+% My packages to load
+\usepackage{pgfplots}
+\usepackage{tikz}
+\usepackage{etoolbox} % Needed for string comparison in the macro
+\usetikzlibrary{matrix, positioning, calc, decorations.pathmorphing, decorations.pathreplacing, decorations.markings, shapes.geometric, patterns,arrows.meta}
+\def\checkmark{\tikz\fill[scale=0.5](0,.35) -- (.25,0) -- (1,.7) -- (.25,.15) -- cycle;} 
+\def\crossmark{\tikz[baseline=0.1ex]\fill[scale=0.35](0.1,0)--(0.5,0.4)--(0.9,0)--(1,0.1)--(0.6,0.5)--(1,0.9)--(0.9,1)--(0.5,0.6)--(0.1,1)--(0,0.9)--(0.4,0.5)--(0,0.1)--cycle;}
+\usepackage{makecell} %This package is used to be able to have "some long \\ text" inside a cell.
+\usepackage{caption}  %For subfigures and captions
+\usepackage{subcaption} %For subfigures and captions
+\usepackage[capitalise,nameinlink]{cleveref} %loaded to be used for referencing equations. %Below: manual formatting for the references
+\crefformat{equation}{Eq.~(#2#1#3)}
+\Crefformat{equation}{Equation~(#2#1#3)}
+\crefmultiformat{equation}{Eqs.~(#2#1#3)}{ and~(#2#1#3)}{, (#2#1#3)}{ and~(#2#1#3)}
+\Crefmultiformat{equation}{Equations~(#2#1#3)}{ and~(#2#1#3)}{, (#2#1#3)}{ and~(#2#1#3)}
+\usepackage{dcolumn} %This package is used for typesetting tables, forcing alignment at decimal points (you can define new column types)
+\newcolumntype{d}[1]{D{.}{.}{#1}} %This is the defined column type, from package "dcolumn". This is like defining a function, where [1] shows that we have one input, and that input is put in the "#1" location. An example input would be d{3.1}, which means that we expect 3 characters before the decimal point and 1 after the decimal.
+\usepackage{mathtools} % for \xLeftrightarrow
+\newcommand{\todo}[1]{
+  \typeout{LaTeX Warning: TODO: #1}% <-- Writes to the log/console
+  {\color{red} TODO: #1}% <-- Writes to the PDF
+  } 
 
 
 % BibLaTeX
@@ -118,7 +149,13 @@
 \usepackage{booktabs}
 \usepackage{amssymb,amsthm}
 \usepackage{amsmath}
+\usepackage{bm} %I added this package to be able to use \bm for bold math symbols, which is used in the definition of the force vector for example. This is because \mathbf does not work for Greek letters and some other symbols, while \bm does.
 
+% Load symbol definitions and macros
+\input{glossary_entries_and_macros.tex}
+\input{abbreviations_in_manuscript.tex}
+\glsaddall[types={symbols}]
+% \usepackage{mathrsfs} %For math script font \mathscr{}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -132,25 +169,25 @@
 
 \frontmatter % to get \pagenumbering{roman}
 
-\includepreface{preface}
-\includepopabstract{popabstract}
-\includepopabstractnl{popabstractnl}
-\includeabstract{abstract}
-\includeabstractnl{abstractnl}
+% \includepreface{preface} %Comment and uncomment to make things faster TODO
+% \includepopabstract{popabstract}
+% \includepopabstractnl{popabstractnl}
+% \includeabstract{abstract}
+% \includeabstractnl{abstractnl}
 
 % To create a list of abbreviations, there are 2 options
 % 1. manual creation of list of abbreviations and inclusion as a chapter
 %    \includeabbreviations{abbreviations}
 % 2. automatic generation via the glossary package
 %    \glossary{name=MD,description=molecular dynamics}
-\myprintglossary
+\myprintabbreviations
 
 % To create a list of symbols, there are 2 options
 % 1. include a manually created nomenclature as a chapter
 %    \includenomenclature{nomenclaturechapter}
 % 2. automatic generation via the nomencl package
 %    \nomenclature[cB]{$c_B(\vec{x})$}{Characteristic function of $B$}
-\myprintnomenclature
+\myprintsymbols
 
 \tableofcontents
 \listoffigures
@@ -163,21 +200,30 @@
 % Show instructions on a separate page
 \instructionschapters\cleardoublepage
 
-\includechapter{introduction}
-\includechapter{manual} % Remove this chapter
-
 % Insert here your own chapters
 % Chapters are expected to be in a tex-file with the given name dot
 % tex and in a directory with the given name in the chapters
 % directory.
 
+
+\includechapter{introduction} %Comment and uncomment to make things faster
+\includechapter{Virtual_load_and_strain_sensing_overview}
+\includechapter{Model_generation}
+\includechapter{Experimental_data_acquisition}
+\includechapter{full_bearing_load_estimation}
 \includechapter{conclusion}
+\includechapter{manual} % Remove this chapter
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \appendix
 
-\includeappendix{myappendix}
+\includeappendix{myappendix1}
+\includeappendix{myappendix2}
+\includeappendix{myappendix3}
+\includeappendix{myappendix4}
+\includeappendix{myappendix5}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \backmatter

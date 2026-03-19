@@ -1,0 +1,622 @@
+% !TeX root = ../../thesis.tex
+\chapter{Model generation}\label{ch:Model_generation}
+
+\section{Introduction to model generation}
+I also talk about model order reduction here. text of Martijn is nice to use here,
+
+\begin{itemize}
+    \item need for reducing the size of models, talking about observability, and the importance of minimal-size representative models
+    \item Differences of model order reduction methods based on how much information / input they require, a-priori and a-posteriori methods, and also model-based and response-based(POD) methods. \cite{besselink_comparison_2013}. Out of scope : nonlinear model order reduction methods
+    \item Equations related to the projection-based linear model order reduction methods
+\end{itemize}
+
+POD
+
+Short explanation on the moment matching method, how it works, and the equations related to it
+
+Short explanation on the CMS method, how it works, and the equations related to it
+
+Commonly used reduction modes and the novel forced respnose mode
+\begin{itemize}
+    \item normal modes
+    \item rigid body modes
+    \item attachment modes
+    \item Forced respnse modes
+    \item modes mentioned but not elaborated: Inertia relief modes, constraint modes, gyroscopic modes
+\end{itemize}
+
+Component mode synthesis (CMS)
+
+\section{Systematic framework for model generation and updating}
+
+\section{Forced response mode: a novel reduction mode for systems with periodic excitation}
+
+\subsection{Introduction}
+
+An important tool in analysis of structures is an accurate numerical model. Having a model enables the investigation of parameters of interest without the need to run experimental tests. These parameters of interest dictate the required complexity of the model. In structural applications, it is often the case that modelling the overall input-output behavior of the structure is not the only objective, and dynamics of the system as well as high strain values are sought after \cite{besselink_comparison_2013}. Highly refined mesh requirements on contact surfaces for contact analysis \cite{blockmans_model_2018} and usage of flexible models for virtual sensing on mechatronic drivetrains \cite{bosmans_virtual_2019} are some of the applications in which a structural model with more complexity has led to improvements in comparison to the state of the art at the time. This has resulted in usage of structural models with high \glspl{dof}. Considering the limitations on computational capabilities of personal computers as well as requirements on many fields such as state estimation on low dimension representative systems, usage of \gls{mor} methods is a frequent practice.
+
+\gls{mor} was first utilized in the fields of control theory and structural dynamics\cite{besselink_comparison_2013,antoulas_approximation_2009}. Two of the earliest methods that emerged in 1960s in the field of structural dynamics are modal expansion (also known as Mode Displacement Method) and \gls{cms} \cite{geers_excitation_1969,craig_coupling_1968,hurty_vibrations_1961}. Modal expansion uses the normal modes of the structure to construct a reduction basis, reducing the dimension of the problem to the selected number of modes. Even though this technique is still utilized \cite{avitabile_prediction_2012,tarpo_expansion_2020}, it suffers from a truncation error which becomes non negligible if the number of selected normal modes is not sufficient. \gls{cms} augments the normal modes with “static modes”, such as attachment modes, inertia relief modes and constraint modes which are the static response of the structure under different conditions the details of which will be given in the next section \cite{craig_review_1985}. These static corrections ensure further reduced model accuracy in higher frequency ranges and decrease the size of the reduced model \cite{rixen_high_2002}.
+
+Another class of Model Order Reduction techniques are the Krylov subspace based reductions. Even though these methods are primarily used in the field of electronics such as generation of macromodels of large component circuits \cite{freund_sprim_2004}, they have also been used in structural applications \cite{barbella_block_2011,bai_krylov_2002,lenhardt_krylov_1999}. These methods focus on preserving the input-output behavior of the transfer function of the system, within a certain frequency range of the input, by the process of moment matching between the two transfer functions \cite{besselink_comparison_2013}. Moment matching refers to matching the first desired number of coefficients (moments) of a polynomial expansion of the transfer function with a new one, thus making a smaller transfer function. Another method which is widely used in the field of control is the method of Balanced Truncation (also known as Truncated Balanced Realization) which was first introduced in the 80s \cite{moore_principal_1981}. Similar to the Krylov subspace based reductions this method also focuses on the input-output behavior of the system, but instead of a moment matching process to generate the reduced model, a two-step process is used. Firstly, a balanced realization of the system is found. In a balanced realization of a system, the states are ordered according to Hankel singular values, which means that they are ordered with respect to their contribution to the input-output behavior of the system: high-ranking states require the least input energy to be excited and generate the highest output energy and visa-versa \cite{antoulas_approximation_2009}. The second step is to do a truncation by selecting the desired number of states from the balanced realization of the system. The advantage of this method which makes it attractive is that it provides an a priori knowledge of the level of inaccuracy of the reduced model, as it provides a measure to calculate the error between the model and the reduced model based on discarded Henkel singular values \cite{schilders_model_2008}. This enables the selection of the size of the reduced model based on the desired error band.
+
+A notable class of techniques for creating reduced models is snapshot-based methods, namely the method of \gls{pod} \cite{kerschen_method_2005}, in which \pgls{svd} of the outputs (snapshots) of the system are used to extract its dynamics. Unlike previous methods, \gls{pod} requires the response of the structure in time to be calculated in order to construct the reduction basis. This has both advantages and disadvantages. On one hand, it makes \gls{pod} a favorable choice of reduction for non-linear systems \cite{xie_proper_2014} and it also makes the reduction basis be tailored to the excitation. On the other hand, the generation of high quality snapshots are computationally costly, and their dependence on excitation type, location, runtime and even initial conditions make them a poor choice for multiple simulations of the same setup, as the states will not be comparable.
+
+Among the aforementioned techniques, only methods of Modal Expansion and \gls{cms} result in physically interpretable states, which makes them a popular choice for the field of structural dynamics. Usage of shakers for excitation of industrial systems or test setups is a common practice in the field, and this paper proposes the usage of Forced Response mode as a physically meaningful mode to be used in reduction of systems undergoing forced excitations, in steady state condition. In this section commonly used methods such as Modal Expansion, \gls{cms}, Krylov subspace based reductions and Balanced Truncation were briefly discussed. In \cref{sec:S3_staticModesAndForcedResponseModes}, static modes will be revisited in more detail and forced response mode will be introduced. In \cref{sec:S3_ExperimentalSetupAndModel} the experimental setup is introduced in detail. In \cref{sec:S3_NumericalResults} the influence of reduction bases on the accuracy of sensor signals obtained from performing a forward simulation is investigated. Initially a reference model with sufficient normal modes is considered, then different reduction modesets are compared based on their level of agreement with the reference model. The unreduced model and measurement matrices used in \cref{sec:S3_NumericalResults} are based on the experimental model and sensors. Finally, the conclusions are provided in \cref{sec:S3_concludingRemarks}.
+
+
+
+\subsection{Static modes and forced response modes}
+\label{sec:S3_staticModesAndForcedResponseModes}
+
+The equations of motion for a lumped mechanical dynamic system resulting from the discretization of its governing differential equations can be written as:
+\begin{align}
+    \selectionMatForce \forceVec (t) = \massMat \ddot{\displacementVec}(t) + \dampingMat \dot{\displacementVec}(t) + \stiffMat \displacementVec (t),
+    \label{eq:S3_eom}
+\end{align}
+in which \(\stiffMat,\massMat,\dampingMat \in \realSet^{\numStates \times \numStates}\) represent the time-invariant stiffness, mass and damping matrices of the system, respectively, with \(\numStates\) being the number of \glspl{dof}, and \(\displacementVec(t) \in \realSet^{\numStates}\) the vector of unknown displacements. The force exerted on the system is represented by the multiplication \(\selectionMatForce \forceVec (t)\), with \(\forceVec (t) \in \realSet^{\numInputLoads}\) representing the vector of externally applied forces, \(\numInputLoads\) representing the number of input loads and \(\selectionMatForce \in \realSet^{\numStates \times \numInputLoads}\) being the input selection matrix.
+
+The aforementioned methods of reduction are all projection-based methods, meaning that the outcome of the reduction is a matrix which projects the system onto a lower-dimension subspace:
+\begin{align}
+    \displacementVec (t) & \approx \reductionMat \genDispVec (t),
+\end{align}
+in which \( \genDispVec \in \realSet^{\numRedStates} \) is the reduced vector of displacements and \(\reductionMat \in \realSet^{\numStates \times \numRedStates}\) is the reduction basis. By combining the above two equations, the reduced equations of motion can be obtained as:
+\begin{align}
+    \selectionMatForceRed \forceVec (t) & = \massMatRed \ddot{\genDispVec}(t) + \dampingMatRed \dot{\genDispVec}(t) + \stiffMatRed \genDispVec (t),
+    \label{eq:S3_eomReduced}
+\end{align}
+in which \(\massMatRed,\dampingMatRed,\stiffMatRed \in \realSet^{\numRedStates \times \numRedStates}\) are the reduced mass, damping and stiffness matrices and \(\selectionMatForceRed = \reductionMat^\intercal \selectionMatForce \in \realSet^{\numRedStates \times \numInputLoads} \) is the reduced input selection matrix. For lightly damped structures the damping term could be omitted, and it is rarely the case that a full damping matrix is available for the full structure, thus using proportional (Rayleigh) or modal damping is common practice. As such, the damping matrix is generally omitted in generation of the reduction basis. If an \gls{ema} is performed on the structure, the modal damping values will be available and the usage of modal damping might be favored \cite{heylen_modal_2005}.
+
+If a system is reduced using \gls{cms} \cite{craig_review_1985}, the reduction is performed using a number of component modes which consists of normal modes as well as static modes. The normal modes account for free vibrations of the system, while the static modes consider the response of the structure to static loading conditions, namely:
+\begin{enumerate}
+    \item Attachment mode: deformation caused by applying a unit force on a redundant boundary \gls{dof}, while keeping the statically determinate boundary \glspl{dof} fixed.
+    \item Constraint mode: deformation obtained when imposing a unit displacement on a boundary \gls{dof}, while keeping the rest of the boundary \glspl{dof} fixed.
+    \item Inertia-relief mode: deformation of a body subject to a constant acceleration field (such as gravity), while keeping the boundary \glspl{dof} fixed.
+\end{enumerate}
+
+These static modes are used in order to reduce the truncation error of normal modes, but they are neither frequency dependent nor they provide any tailored response for steady state response of harmonic excitations. This paper proposes the usage of “Forced response mode” to improve the reduction basis in this case.
+
+For an undamped system, the equations of motion can be written using \cref{eq:S3_eom} where \(\dampingMat = 0\). Considering a sinusoidal input force of \( \forceVec = f_\freq \sin{\freq t} \), this results into:
+\begin{align}
+    \selectionMatForce f_\freq \sin{\freq t} = \massMat \ddot{\displacementVec}(t)  + \stiffMat \displacementVec (t).
+\end{align}
+
+The displacement response of the system will also be sinusoidal, and can be written as \(\displacementVec = \displacementVec_\freq \sin{\freq t}\). By substituting this into the above equation, we obtain:
+\begin{align}
+    \selectionMatForce f_\freq \sin{\freq t} = \massMat \freq^2  \displacementVec_\freq \sin{\freq t}  + \stiffMat \displacementVec_\freq \sin{\freq t}.
+\end{align}
+
+Dividing both sides by $\sin{\freq t}$, we get:
+\begin{align}
+    \selectionMatForce f_\freq = -\massMat \freq^2 \displacementVec_\freq + \stiffMat \displacementVec_\freq,
+\end{align}
+which, by rearranging, can be written as:
+\begin{align}
+    \displacementVec_\freq =  \frac{\selectionMatForce f_\freq}{\stiffMat - \massMat \freq^2} .
+\end{align}
+
+The above expression is the definition of a forced response mode. This definition will be used to construct the forced response mode in \cref{sec:S3_NumericalResults}, where the performance of reduction bases containing different modes are investigated and compared.
+
+
+\subsection{Experimental setup and the model of it}
+\label{sec:S3_ExperimentalSetupAndModel}
+
+The experimental setup used in this article consists of a horizontal beam made of aluminum, to which 9 steel masses are attached in order to add complexity to the dynamics of the system. The details can be found in \cite{kirchner_compressive_2018}. The beam is attached to two supporting beams (main section 80×80 mm , overall height 224 mm) which are made of steel, and these are attached to a large underplate (1280 ×200 ×12 mm) which connects the whole structure to the support surface through numerous bolt connections, ensuring a rigid connection. \todo{fix the units and X representing times} A picture of the setup is provided in \cref{fig:S3_beamSetup}. An \gls{ema} has been performed on the assembled structure (using 62 modal hammer hits, details of accelerometers in the next paragraph), comparing the modeshapes and frequencies of the structure with those of the model.
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=\textwidth]{beam setup.png}
+    \caption[The beam setup and the CAD of it]{The experimental beam setup and the CAD of it.}
+    \label{fig:S3_beamSetup}
+\end{figure}
+
+The model for this setup is a linear \gls{fe} model with 94K first order hexagonal elements of ~3.6 mm size, 130K nodes and 760K DoFs, and simplifying assumptions such as considering the bolted surfaces as rigidly connected, regions of ideal rigid boundary conditions and using a simple model (modified local stiffness) to represent welded connections are considered. \todo{units} \Cref{tab:S3_modalPropertiesAndCorrelation} and \cref{fig:S3_macMatrix} show these results for the first 8 modes. The modeshapes are provided in \cref{ch:myappendix3}.
+
+\Cref{tab:S3_modalPropertiesAndCorrelation} provides information about the model, and its level of accuracy with respect to the experimental setup. \gls{mac} for each mode is provided in the table, which is a measure of linear dependency between two modes and it ranges between 0 and 1, with 0 being linearly fully independent. The level of linear dependency for modes 6 and 7 is lower than other modes. On the frequency error column, the highest percentage of error is seen in the third mode, which exhibits a lower frequency in comparison with the experimental setup. Notwithstanding the frequency error, a \gls{mac} value of 0.978 is obtained.
+
+\Cref{fig:S3_macMatrix} shows the heat map plot of \gls{mac} values correlating the experimental modeshapes and those of the model. Starting from the top left, the horizontal axis represents the experimental modeshapes while the vertical one represents the modeshapes of the model. The color green corresponds to 0, and red to 1. The high values of this plot are provided in \cref{tab:S3_modalPropertiesAndCorrelation} as well. Lower correlation of the model modeshapes with regards to modes 6 and 7 is noticeable in the plot. The cross-correlation of modes 6 and 7 is likely due to the fact that they are closely spaced in frequency domain, making it challenging to distinguish them in the experimental setup. The rest of the modes show good correlation between the model and the experimental setup.
+
+\begin{table}[htp]
+    \centering
+    \caption[Modal properties of the beam setup and its updated \gls{fe} model]{Modal properties of the beam setup and the updated \gls{fe} model of it. The model shows good overall correlation with the experimental results, with mode 3 having a highest frequency error.}
+    \label{tab:S3_modalPropertiesAndCorrelation}
+    \renewcommand{\arraystretch}{1.2} % Adds a little vertical padding for readability
+    \begin{tabular}{cd{3.2}d{3.2}d{1.3}d{2.3}}
+        \hline
+
+        \makecell{Mode                                             \\ number} &
+        \multicolumn{1}{c}{\makecell{Freq.                         \\ {[}Hz{]}}} &
+        \multicolumn{1}{c}{\makecell{Exp. Freq.                    \\ {[}Hz{]}}} &
+        \multicolumn{1}{c}{MAC} &
+        \multicolumn{1}{c}{\makecell{Freq. error                   \\ \%}} \\
+        \hline
+        1                       & 25.66  & 25.62  & 0.990 & 0.172  \\
+        2                       & 36.28  & 36.23  & 0.984 & 0.135  \\
+        3                       & 44.70  & 48.45  & 0.978 & -7.743 \\
+        4                       & 70.19  & 69.51  & 0.990 & 0.976  \\
+        5                       & 94.32  & 92.99  & 0.992 & 1.428  \\
+        6                       & 135.20 & 133.60 & 0.689 & 1.208  \\
+        7                       & 138.20 & 132.30 & 0.702 & 4.432  \\
+        8                       & 149.00 & 144.20 & 0.980 & 3.333  \\ \hline
+    \end{tabular}
+\end{table}
+\todo{minus sign in the table, could be done with siunitx package apparently}
+
+\begin{figure}[htp]
+    \centering
+    % \resizebox{0.35\textwidth}{!}{
+    \begin{tikzpicture}
+        % 1. Place your base image
+        % Make sure "image_185efb.png" is in the same folder as your .tex file
+        \node[anchor=south west, inner sep=0] (image) at (0,0) {\includegraphics[width=5cm]{MACPlot.png}};
+
+        % 2. Create an overlay scope 
+        % This maps (0,0) to bottom-left and (1,1) to top-right of the image
+        \begin{scope}[x={(image.south east)}, y={(image.north west)}]
+
+            % Define a nice purple color for the arrows to match your reference
+            \definecolor{arrowpurple}{RGB}{120, 50, 180}
+
+            % --- Horizontal annotation (Experimental modes) ---
+            % Draw the arrow pointing right
+            \draw[-latex, arrowpurple, line width=1.5pt] (0.40, 0.94) -- (0.70, 0.94);
+            % Add the text just below the arrow
+            \node[anchor=north, font=\small] at (0.55, 0.92) {Experimental modes};
+
+            % --- Vertical annotation (Numerical modes) ---
+            % Draw the arrow pointing down
+            \draw[-latex, arrowpurple, line width=1.5pt] (0.06, 0.60) -- (0.06, 0.25);
+            % Add the rotated text next to the arrow
+            \node[anchor=south, rotate=90, font=\small] at (0.17, 0.40) {Numerical modes};
+
+        \end{scope}
+    \end{tikzpicture}
+    % }
+    \caption[Beam setup model MAC plot]{Heat map plot of MAC values correlating the experimental and numerical modes of the beam setup. While most modes show good correlation, modes 6 and 7 have a lower MAC value and appear cross-correlated, which is likely due to the fact that they are closely spaced in frequency domain.}
+    \label{fig:S3_macMatrix}
+\end{figure}
+
+The setup is instrumented with a full-bridge strain gauge measuring the bending (4x CEA-13-250UNA-350, two on top and two on the bottom of the beam along its main axis), an impedance head (PCB ICP® 288D01) and 8 accelerometers (6 monoaxial, 2 triaxial). It is excited by a shaker (The Modal Shop Miniature Inertial Shaker K2002E01) at the location of the impedance head, which is attached from one side to the shaker, and from the other side to the structure. The impedance head outputs a force and an acceleration signal, enabling direct measurement of the force exerted to the structure. Overall, 13 acceleration signals, 1 strain signal and 1 force signal are measured from the structure. The location of the sensors on the setup is indicated in \cref{fig:S3_sensorSchematic}. For \gls{ema}, only the accelerometers were used, in the same locations and orientations.
+
+\begin{figure}
+    \centering
+    \resizebox{1\textwidth}{!}{
+        \begin{tikzpicture}
+
+            % =====================================================
+            % PARAMETERS  (edit these only)
+            % =====================================================
+            \def\HalfWidth{8}
+            \def\ColumnWidth{1.5}
+            \def\ColumnHeight{5}
+            \def\BeamThickness{0.4}
+            \def\RibHeight{1.4}
+            \def\RibWidth{0.25}
+            \def\NumRibs{9}
+            \def\BasePlateThickness{0.2}
+            \def\SupportWidth{14}
+            \def\SupportHeight{0.9}
+
+            % Sensor parameters
+            \def\ShakerWidth{0.5}
+            \def\ShakerHeight{0.5}
+
+
+            % Derived
+            \pgfmathsetmacro{\BeamY}{\ColumnHeight - \BeamThickness}
+            \pgfmathsetmacro{\RibBottom}{\BeamY - \RibHeight}
+            \pgfmathsetmacro{\RibSpacing}{2*\HalfWidth/(\NumRibs+1)}
+
+            % =====================================================
+            % Styles
+            % =====================================================
+            \tikzset{
+                frame/.style={draw=blue!60!black, fill=blue!60!black!80},
+                support/.style={draw=black, fill=green!60!black!70},
+                monoacc/.style={regular polygon, regular polygon sides=3,
+                        draw=blue!60!black, fill=green!60, minimum size=14pt, scale=0.8},
+                triax/.style={circle, draw=blue!60!black, fill=yellow, minimum size=10pt},
+                strain/.style={diamond, draw=blue!60!black, fill=red, minimum size=10pt},
+                impedance/.style={draw=blue!60!black, fill=pink!70}
+            }
+
+            % =====================================================
+            % STRUCTURE
+            % =====================================================
+
+            % Columns
+            \draw[frame]
+            (-\HalfWidth-\ColumnWidth,0)
+            rectangle
+            (-\HalfWidth,\ColumnHeight);
+
+            \draw[frame]
+            (\HalfWidth,0)
+            rectangle
+            (\HalfWidth+\ColumnWidth,\ColumnHeight);
+
+            % Base plates
+            \draw[frame]
+            (-\HalfWidth-\ColumnWidth-0.2,-0.05)
+            rectangle
+            (-\HalfWidth+0.2,-0.25);
+
+            \draw[frame]
+            (\HalfWidth-0.2,-0.05)
+            rectangle
+            (\HalfWidth+\ColumnWidth+0.2,-0.25);
+
+            % Top beam
+            \draw[frame]
+            (-\HalfWidth,\BeamY)
+            rectangle
+            (\HalfWidth,\ColumnHeight);
+
+            % Ribs
+            \foreach \i in {1,...,\NumRibs}
+                {
+                    \pgfmathsetmacro{\x}{-\HalfWidth + \i*\RibSpacing}
+                    \draw[frame]
+                    (\x-\RibWidth/2,\RibBottom)
+                    rectangle
+                    (\x+\RibWidth/2,\BeamY);
+                }
+
+            % Thin base plate
+            \draw[frame]
+            (-\HalfWidth-\ColumnWidth-0.2,-0.3)
+            rectangle
+            (\HalfWidth+\ColumnWidth+0.2,-0.3-\BasePlateThickness);
+
+            % Support surface
+            \draw[support]
+            (-\SupportWidth/2,-0.6)
+            rectangle
+            (\SupportWidth/2,-0.6-\SupportHeight);
+
+            \node[text=white]
+            at (0,-0.6-\SupportHeight/2)
+            {Support surface};
+
+            % =====================================================
+            % SENSORS  (adjusted to match reference image)
+            % =====================================================
+
+            % --- Shaker (slightly more right than before)
+            \pgfmathsetmacro{\ShakerX}{0.50*\HalfWidth}
+
+            \draw[impedance]
+            (\ShakerX-\ShakerWidth/2,\ColumnHeight)
+            rectangle
+            (\ShakerX+\ShakerWidth/2,\ColumnHeight+\ShakerHeight);
+
+            \node[fill=brown!40, draw=none]
+            at (\ShakerX,\ColumnHeight+\ShakerHeight+0.28)
+            {Shaker};
+
+            % --- Top beam accelerometers (visually matching original layout)
+
+            \node[monoacc]  at (-0.7*\HalfWidth,\ColumnHeight) {};   % leftmost
+            \node[strain]   at (-0.5*\HalfWidth,\ColumnHeight) {};   % red diamond
+            \node[monoacc]  at (-0.3*\HalfWidth,\ColumnHeight) {};
+            \node[monoacc]  at (-0.10*\HalfWidth,\ColumnHeight) {};
+            \node[monoacc]  at (0.10*\HalfWidth,\ColumnHeight) {};
+
+            % --- Lower monoaxial accelerometer (clearly between ribs)
+            \node[monoacc] at (0.6*\HalfWidth,\RibBottom+0.05) {};
+            \node[monoacc] at (-0.8*\HalfWidth,\RibBottom+0.05) {};
+
+
+            % --- Triaxial accelerometers on columns
+            \node[triax]
+            at (-\HalfWidth-\ColumnWidth/2+0.5,4.4) {};
+
+            \node[triax]
+            at (\HalfWidth+\ColumnWidth/2+0.5,4.4) {};
+
+            % =====================================================
+            % LEGEND  (repositioned & resized to match reference)
+            % =====================================================
+
+            \def\sh{-1} %to use for legend stuff
+            \def\sw{-2.5} %to use for legend stuff
+
+            \begin{scope}[shift={(0,1.0)}]
+
+                \draw[black] (-4.8+\sw,-0.2+\sh) rectangle (4.8+\sw,2.7+\sh);
+
+                % Row spacing
+                \def\rowsep{0.65}
+
+                \node[strain] at (-4.2+\sw,2.2+\sh) {};
+                \node[anchor=west] at (-3.4+\sw,2.2+\sh)
+                {Strain gauge full bridge (Y bending)};
+
+                \node[monoacc] at (-4.2+\sw,2.2-\rowsep+\sh) {};
+                \node[anchor=west] at (-3.4+\sw,2.2-\rowsep+\sh)
+                {Accelerometer (Monoaxial, Z)};
+
+                \node[triax] at (-4.2+\sw,2.2-2*\rowsep+\sh) {};
+                \node[anchor=west] at (-3.4+\sw,2.2-2*\rowsep+\sh)
+                {Accelerometer (Triaxial)};
+
+                \draw[impedance]
+                (-4.35+\sw,2.2-3*\rowsep-0.1+\sh)
+                rectangle
+                (-4.05+\sw,2.2-3*\rowsep+0.2+\sh);
+
+                \node[anchor=west] at (-3.4+\sw,2.2-3*\rowsep+\sh)
+                {Impedance head (Z)};
+
+            \end{scope}
+
+
+            % =====================================================
+            % AXES
+            % =====================================================
+            \draw[-{Latex[length=3mm]}]
+            (-\HalfWidth-\ColumnWidth-0.6,-0.8)
+            --
+            (-\HalfWidth-\ColumnWidth-0.6,0.6);
+            \node[left]
+            at (-\HalfWidth-\ColumnWidth-0.6,0.6) {Z};
+
+            \draw[-{Latex[length=3mm]}]
+            (-\HalfWidth-\ColumnWidth-0.6,-0.8)
+            --
+            (-\HalfWidth-\ColumnWidth+0.6,-0.8);
+            \node[below]
+            at (-\HalfWidth-\ColumnWidth+0.6,-0.8) {X};
+
+        \end{tikzpicture}
+    }
+    \caption[Sensor placement on the beam setup]{Sensor placement on the beam setup. The setup is well-instrumented, with a total of 6 uniaxial accelerometers, two triaxial accelerometers, one full bridge strain gauge and one impedance head being used to measure the response of the structure. The inertial shaker is attached at the location of the impedance head, which allows for direct measurement of the force exerted on the structure.}
+    \label{fig:S3_sensorSchematic}
+\end{figure}
+
+The setup is excited by the shaker with a sinusoidal 50 Hz force in Z direction. The force signal generated by impedance head is used as the force signal fed to the forward simulation (\cref{sec:S3_NumericalResults}), in order to enable a comparison between experimental and numerical results in future work. This excitation frequency was chosen because it does not coincide with any experimental mode frequency, yet it is close enough to the third mode which has the highest frequency error in the model. Since the levels of vibrations in Y direction incurred by this excitation are low, the signals in Y direction recorded by the triaxial accelerometers are not considered in the rest of this paper.
+
+\subsection{Numerical results}
+\label{sec:S3_NumericalResults}
+
+In this section initially some preliminary equations and notable parameters are mentioned, followed by defining a reference model using a high number of normal modes. Afterwards, the model is reduced using different reduction modesets and after a forward simulation is performed, the error in resulting sensor signals is compared. Finally the sensitivity of the Forced Response mode to its frequency and damping value is investigated.
+
+Continuing from \cref{eq:S3_eomReduced}, a state space representation can be generated for the model:
+\begin{align}
+    \dot{\stateVec}(t) = \stateMatCont \stateVec(t) + \inputMatCont \forceVec(t),
+    \label{eq:S3_stateSpaceRep}
+\end{align}
+in which:
+\begin{align}
+    \stateMatCont = \begin{bmatrix}
+                        {\mathbf{0}}_{\numRedStates}     & {\mathbf{I}}_{\numRedStates}       \\
+                        -{\massMatRed}^{-1} \stiffMatRed & -{\massMatRed}^{-1} \dampingMatRed
+                    \end{bmatrix}, \quad
+    \inputMatCont = \begin{bmatrix}
+                        {\mathbf{0}}_{\numRedStates \times \numInputLoads} \\
+                        {\massMatRed}^{-1} \selectionMatForceRed
+                    \end{bmatrix}, \quad
+    \stateVec = \begin{bmatrix}
+                    \genDispVec \\
+                    \dot{\genDispVec}
+                \end{bmatrix},
+    \label{eq:S3_stateMatAndInputMatDefinition}
+\end{align}
+are continuous state and input matrices and the state vector, respectively. In the equation above, \(\selectionMatForceRed \in  \realSet^{\numRedStates \times \numInputLoads} \) is the reduced input selection matrix for the external loads. Using the exponential discretization scheme and a zero-order hold assumption, discretized state and input matrices are derived:
+\begin{align}
+    \stateMatDisc=e^{\stateMatCont \Delta t}, \quad
+    \inputMatDisc = \stateMatDisc^{-1} [\stateMatCont - \mathbf{I}] \inputMatCont,
+\end{align}
+in which \(\Delta t\) is the time step of the discretization. Using \cref{eq:S3_stateSpaceRep}, the discretized state space representation which is used for performing the forward simulation is derived, with the assumption of approximately constant input force during each time step:
+\begin{align}
+    \stateVec_{k+1} = \stateMatDisc \stateVec_{k} + \inputMatDisc \forceVec_{k}.
+\end{align}
+
+The above equation is used for performing the forward simulations of this section.
+
+A few important points should be mentioned:
+\begin{enumerate}
+    \item No experimental data is used in this section, and the acceleration and strain signals generated in forward simulations using different modesets use the same measurement matrices as the sensors in the experimental setup.
+    \item Initial conditions that ensure steady-state behavior are calculated for the largest modeset of the study (500 normal modes), and projected into the proper dimensions for other simulations. In order to minimize the effects of possible transient dynamics caused by numerical errors in initial conditions, only the second half of the signals is used in calculating the error (\cref{eq:S3_NRMSE}) where we know the signal to be in steady state response regime.
+    \item Similar 50 Hz force signal in Z direction (as mentioned in the end of \cref{sec:S3_ExperimentalSetupAndModel}) and time step (1e-6 seconds) is used for all forward simulations. \todo{siunix}
+    \item Reduced damping matrix \(\dampingMatRed[]\) in \cref{eq:S3_stateMatAndInputMatDefinition} is considered as a modal damping matrix. Modal damping coefficient values extracted through \gls{ema} are used for normal modes. All non-normal modes are assigned a modal damping coefficient value of \(\damping_{i} = 1e-3\) which populates the diagonal of the damping matrix, such that:
+          \begin{equation}
+              \dampingMatRed[,ij]  =
+              \left\{
+              \begin{aligned}
+                  2 \naturalFreq[,i] \damping_{i} & \quad \text{if } i = j    \\
+                  0                               & \quad \text{if } i \neq j
+              \end{aligned}
+              \right. ,
+          \end{equation}
+          in which \(\naturalFreq[,i]\) refers to the eigenfrequency of the \(i\)-th reduced state.
+    \item The reduction bases are orthonormalized with respect to the mass matrix, such that when they are applied to the system as in \cref{eq:S3_eomReduced}, it results in an identity mass matrix and a diagonal stiffness matrix with squared eigenvalues of the system, i.e. \(\naturalFreq[,i]^2\).
+\end{enumerate}
+
+\subsubsection{Reference model and convergence study}
+
+In order to have a reference model of a manageable size, a reduced order model with a large number of normal modes was created. In creation of such a model, it is important to select an appropriate number of modes that, while sufficiently reducing the size of the problem, also maintain a high level of accuracy. To this end a convergence study was performed in which the accelerometer and strain gauge full bridge responses resulting from a forward simulation with different reduction basis sizes were compared. Nine reduction bases were considered, ranging from 100 to 500 normal modes. The basis with 500 modes was considered as the reference and the normalized deviation from the signals resulting from this reduction basis was computed as the error using the following formula:
+\begin{align}
+    \text{NRMSE} = \frac{1}{\sigma_{\overline{y}}} \sqrt{\frac{\sum_{k=1}^{N}(y_k - \overline{y_k})^2}{N}}.
+    \label{eq:S3_NRMSE}
+\end{align}
+
+In the aforementioned formula, \(y_k\) refers to the measurement signal generated by each sensor, and \(\overline{y_k}\) is the same sensor signal generated by the reference model (with 500 modes), while \(N\) is the length of the signal. The Normalized Root Mean Square Error (NRMSE) formulation above ensures that each sensor response is scaled according to its standard deviation (\(\sigma_{\overline{y}}\)). This results in an interpretable range, meaning that even though the error ranges between zero and infinity, if \(\overline{y_k}\) is a zero signal, the value of error will be equal to one. The error of accelerometer and strain gauge responses based on the number of normal modes in their respective bases are plotted in \cref{fig:S3_modesAndReducingErrors} (acc sig and S.G sig, respectively). The mean of the error of acceleration responses is also provided (acc mean).
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=.99\textwidth]{Figure_modesAndReducingErrors_20260310_163553.pdf}
+    \caption[Relative output error of reduction bases with different sizes]{Relative error in the output signals resulting from forward simulations using reduction bases with different number of normal modes, compared to a reference model with 500 normal modes. The error is calculated using the NRMSE formula in \cref{eq:S3_NRMSE}. The error generally decreases as the number of modes increases, but it is not strictly monotonic for each individual sensors. This is more pronounced in strain gauge outputs.}
+    \label{fig:S3_modesAndReducingErrors}
+\end{figure}
+
+\todo{A lot more to explain on this figure, and I added the 2-norm myself so should add explanation related to it. in general individual DOF monotonic decrease of error is not garanteed but \cite{antoulas_approximation_2009} shows in chapter 7 of his book (page 212) that the upper bound of the norm of the error (difference between the full order model and the reduced order model) is guaranteed to reduce as the number of modes increases. For the next subsection (comparison of modes) I'm using the average of the acc error, but in this figure I justify it because  as it can be seen it follows the same trend (ideal would be 2-norm error but it's computationally demanding)}
+
+\todo{Could reference Maes and Lombaert paper "The influence of out-of-band modes in system inversion" and say while the reduced order models could represent full order models well around natural frequencies, in between the modes ther error is certainly higher. As such, the added value of using forced response mode is more pronounced if the frequency of the excitation is in between the modes of the system, which usually also happens in practice.}
+
+Since the modeset with 500 modes is considered the baseline, its error is zero. As it can be seen in the graph, the acceleration signals (and their average) behave as expected, i.e., as the dimension of the model increases, the error decreases. However, it should be noted that error reduction is not guaranteed to be monotonic for each individual sensor. This behavior is more pronounced in the strain signal, but focusing on individual accelerometer outputs confirms this as well. This is likely due to the difference in the nature of generating the measurement matrix for strain gauges and accelerometers. The signal of the accelerometer is considered as the acceleration of a single node on the unreduced model (in the same direction the accelerometer is mounted on). In contrast to acceleration measurement equations which correlate the reduced states to a single unreduced DoF on the structure, strain measurement equations correlate the reduced states to the unreduced nodal displacements corresponding to the nodes that the surface of the gauge covers. These unreduced nodal displacements are then converted to element-wise strains based on the type of element, and then interpolated back on the nodal locations. At the same time, since a full bridge is being used, strain values of 4 gauges in different locations are being added up to generate the final signal. The inclusion of many unreduced DoFs of the structure due to the aforementioned reasons results in the non-monotonic behavior observed. Finally it should be noted that the value of the error observed in the strain signal for all of the modeset sizes is less than 0.03 percent.
+
+Based on \cref{fig:S3_modesAndReducingErrors}, the modeset with 450 normal modes is selected as the reference, because the error reduces less than 0.001 percent by increasing the modeset size. \todo{instead say 2-norm error is below 1e6 AND also error is reduced less than blahblah} Additionally, the average of the error of acceleration signal is selected as the metric to judge the performance of different modesets in the next section. Even though a comparison between the full DoFs of the model would be the ideal metric, it would also be computationally demanding, and the error of the 11 acceleration signals are deemed adequate for assessing the performance of the models.
+
+\subsubsection{Errors of different reduction modesets}
+
+In order to assess the performance of the forced response mode, a number of different reduction modesets are considered and after performing a forward simulation, the error attributed to each modeset is calculated.
+
+The selected modesets are clustered in four groups. The first group consists of normal modes (shown as NM in figure legends) with sizes 3,5,8,10,15,20 and 100. The remaining three groups contain different static modes:
+\begin{itemize}
+    \item Attachment mode (shown as AM in figure legends)
+    \item Inertia relief mode (shown as IRM in figure legends)
+    \item Forced response mode (shown as FRM in figure legends).
+\end{itemize}
+
+These latter three groups include the modes individually, as well as in combination with the normal modes. For example, the group of attachment mode consists of the following modesets: attachment mode, attachment mode + 3 normal modes, attachment mode + 5 normal modes etc. Error values for all groups are provided in \cref{fig:S3_modesetCompare1}.
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=.99\textwidth]{Figure_modesetCompare1_20260311_134042.pdf}
+    \caption[Reduction modeset error comparison]{Error of average acceleration signals resulting from forward simulations using different reduction modesets, compared to the reference model. The static modes are investigated alone and in combination with different number of normal modes, which is indicated on the x-axis. The damping value of \(\damping = 1e-3\) is considered for all non-normal modes. The increase in error by addition of normal modes (observed in FRM and AM modesets) is unexpected and further investigated in the next section.}
+    \label{fig:S3_modesetCompare1}
+\end{figure}
+
+Looking at \cref{fig:S3_modesetCompare1}, the following observations can be made:
+\begin{itemize}
+    \item As a general trend of the graph, the error is decreasing for all groups as the number of normal modes increases, and this is an expected behavior since a higher number of normal modes in the reduction basis results in a more accurate and information rich reduction basis.
+    \item With the exception of the inertia relief mode group, for all other groups the reduction in error incurred due to increasing the normal modes from 15 to 20 is greater than going from 20 to 100. This observation puts the diminishing returns of benefits of adding normal modes after the low frequency ones have already been added into perspective.
+    \item For all groups, no meaningful difference in error is observed between modesets with 8 and 10 normal modes. This implies that the 9th and 10th normal modes do not contribute to the vibrations of the system in directions of interest (Z and X), effectively making them redundant. This is to emphasize the importance of inspecting each mode in order to ascertain its relevance with regards to the excitation, if a small reduction basis is to be made.
+    \item For modesets with a high number of added normal modes, a minimal difference in accuracy of different groups is observed.
+    \item For modesets with a low number of added normal modes, the group of forced response mode has a clear advantage, to the extent that a modeset with only the forced response mode is approximately as accurate as a modeset with 10 normal modes.
+    \item Attachment mode and forced response mode groups with 8 and 10 added normal modes exhibit an unexpectedly high error value. This will be discussed in the next section.
+\end{itemize}
+
+
+\subsubsection{Sensitivity analysis of the forced response mode to input frequency and damping value}
+
+
+As it was mentioned in the beginning of \cref{sec:S3_NumericalResults}, a modal damping value of \(\damping = 1e-3\) was assigned to all non-normal modes. Upon further inspection of modes with 8 and 10 normal modes, it became apparent that the frequency of the added static modes were in the range of the harmonics of the input force, for example the forced response mode in modeset ‘FRM+10NM’ has the eigenfrequency of 349.51 Hz \todo{siunix}, which is in the vicinity of the 7th harmonic of the input force. Since this mode is being excited, the inaccuracy of designated damping value is more punishing. This led to the investigation of the effect of assigned damping values on the error of each modeset.
+
+\Cref{fig:S3_dampingOfStaticModeInvestigation} shows the error of the forced response mode group with respect to the damping values assigned to each modeset in the group. Each line represents a different reduction modeset, and the minima are specified with a black square marker (results for modesets with 8 and 10 normal modes are identical). In the legend the frequency of the mode after orthonormalization is provided. Similar graphs were created for AM and IRM groups which are not presented to avoid redundancy. \todo{think about providing them?} AM group exhibited similar minima pattern, while IRM group was more irregular and had lower optimal damping values.
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=.99\textwidth]{Figure_dampingOfStaticModeInvestigation_20260311_153357.pdf}
+    \caption[Error of modesets in FRM group based on damping coefficient]{Error of modesets in FRM group based on their assigned damping coefficient. The black square marks the minimum of each curve. While the optimal damping ratio appears to be the critical damping value for larger sets, this does not hold for smaller sets.}
+    \label{fig:S3_dampingOfStaticModeInvestigation}
+\end{figure}
+
+Looking at \cref{fig:S3_dampingOfStaticModeInvestigation}, the following conclusions can be made:
+\begin{itemize}
+    \item Generally, damping coefficients assigned to non-normal modes have a lower impact as the number of normal modes increases. This is in accordance with the first observation made on \cref{fig:S3_modesetCompare1}, i.e. modes with higher frequencies have less importance and participation, thus their damping coefficient also has a lower influence on the error.
+    \item The damping coefficient increases as the size of the modeset increases, and it tends towards critical damping (\(\damping = 1\)). For the FRM + 100NM case this does not hold, although the difference in error between using damping values of \(1e-1\) and 1 for this case is negligible .
+    \item If a damping coefficient for a non-normal mode is being sought via an optimization or trial and error method, a conservative approach is to start from a low value if the reduction basis is small, and a large value (critical damping) if it is large.
+\end{itemize}
+
+After having investigated the effect of the damping coefficient,\cref{fig:S3_modesetCompare1} can be recreated using adjusted damping values for each individual modeset. \Cref{fig:S3_modesetCompare2} shows this result, comparing it with previous results presented in \cref{fig:S3_modesetCompare1}, in dashed lines:
+
+\begin{figure}[htp]
+    \centering
+    \begin{tikzpicture}
+        % Load the original plot as a node so we can use normalised coordinates
+        \node[anchor=south west, inner sep=0] (image) at (0,0)
+        {\includegraphics[width=.99\textwidth]{Figure_modesetCompare2_20260312_154730.pdf}};
+        % Normalised coordinate system: (0,0)=bottom-left, (1,1)=top-right of the image
+        \begin{scope}[x={(image.south east)}, y={(image.north west)}]
+            % ---------------------------------------------------------------
+            % Overlay legend — adjust anchor coordinate (currently 0.08,0.04)
+            % to align with the existing legend in the PDF.
+            % ---------------------------------------------------------------
+            \definecolor{legGray}{RGB}{135,135,135}
+            \definecolor{legGold}{RGB}{234,182,56}
+            \definecolor{legCyan}{RGB}{12,175,226}
+            \definecolor{legPurple}{RGB}{69,45,156}
+            \def\legscale{0.79}
+            \node[anchor=south west,
+                fill=white, draw=black, line width=1pt,
+                inner xsep=1.5pt, inner ysep=1.5pt] (leg) at (0.125, 0.155) {%
+                \begin{tikzpicture}[x=1cm, y=1cm, font=\small, scale=\legscale, transform shape]
+                    \def\linehalf{0.6} % half length of each legend line sample
+                    \def\xtext{0.65}    % x where label text starts
+                    \def\ystep{-0.4}   % row spacing
+                    \coordinate (c1) at (0, 0);
+                    \coordinate (c2) at (0, \ystep);
+                    \coordinate (c3) at (0, 2*\ystep);
+                    \coordinate (c4) at (0, 3*\ystep);
+                    \coordinate (c5) at (0, 4*\ystep);
+                    \coordinate (c6) at (0, 5*\ystep);
+                    \coordinate (c7) at (0, 6*\ystep);
+                    % 1: Only NM
+                    \draw[legGray, line width=4.2pt] ([xshift=-\linehalf cm]c1) -- ([xshift=\linehalf cm]c1);
+                    \node[fill=black, minimum size=8.5pt, inner sep=0, anchor=center, outer sep=0pt] at (c1) {};
+                    \node[anchor=west, text=black] at (\xtext, 0) {Only NM};
+
+                    % 2: AM
+                    \draw[legGold, line width=1.5pt] ([xshift=-\linehalf cm]c2) -- ([xshift=\linehalf cm]c2);
+                    \node[regular polygon, regular polygon sides=3, fill=legGold, inner sep=2.35pt, anchor=center, outer sep=0pt] at (c2) {};
+                    \node[anchor=west, text=black] at (\xtext, \ystep) {AM};
+
+                    % 3: IRM
+                    \draw[legCyan, line width=1.5pt] ([xshift=-\linehalf cm]c3) -- ([xshift=\linehalf cm]c3);
+                    \node[regular polygon, regular polygon sides=3, fill=legCyan, inner sep=2.35pt, rotate=180, anchor=center, outer sep=0pt] at (c3) {};
+                    \node[anchor=west, text=black] at (\xtext, 2*\ystep) {IRM};
+
+                    % 4: FRM
+                    \draw[legPurple, line width=1.5pt] ([xshift=-\linehalf cm]c4) -- ([xshift=\linehalf cm]c4);
+                    \draw[legPurple, line width=1.5pt] ([yshift=-0.14cm]c4) -- ([yshift=0.14cm]c4);
+                    \node[anchor=west, text=black] at (\xtext, 3*\ystep) {FRM};
+
+                    % 5: AM (Fig. 5)
+                    \draw[legGold, line width=1.5pt, dashed, dash pattern=on 6pt off 5pt] ([xshift=-\linehalf cm]c5) -- ([xshift=\linehalf cm]c5);
+                    \node[regular polygon, regular polygon sides=3, fill=legGold, inner sep=2.35pt, anchor=center, outer sep=0pt] at (c5) {};
+                    \node[anchor=west, text=black] at (\xtext, 4*\ystep) {AM (\cref{fig:S3_modesetCompare1})};
+
+                    % 6: IRM (Fig. 5)
+                    \draw[legCyan, line width=1.5pt, dashed, dash pattern=on 6pt off 5pt] ([xshift=-\linehalf cm]c6) -- ([xshift=\linehalf cm]c6);
+                    \node[regular polygon, regular polygon sides=3, fill=legCyan, inner sep=2.35pt, rotate=180, anchor=center, outer sep=0pt] at (c6) {};
+                    \node[anchor=west, text=black] at (\xtext, 5*\ystep) {IRM (\cref{fig:S3_modesetCompare1})};
+
+                    % 7: FRM (Fig. 5)
+                    \draw[legPurple, line width=1.5pt, dashed, dash pattern=on 6pt off 5pt] ([xshift=-\linehalf cm]c7) -- ([xshift=\linehalf cm]c7);
+                    \draw[legPurple, line width=1.5pt] ([yshift=-0.14cm]c7) -- ([yshift=0.14cm]c7);
+                    \draw[legPurple, line width=1.5pt] ([xshift=-0.14cm]c7) -- ([xshift=0.14cm]c7);
+                    \node[anchor=west, text=black] at (\xtext, 6*\ystep) {FRM (\cref{fig:S3_modesetCompare1})};
+                \end{tikzpicture}%
+            };
+        \end{scope}
+    \end{tikzpicture}
+    \caption[Reduction modeset error comparison - with adjusted damping]{Error of modesets using different static modes and different number of normal modes is calculated, with the optimal damping values for each modeset. The results from \cref{fig:S3_modesetCompare1}, in which non-optimcal damping values were being used are also included in this figure. It is evident that the Forced Response Mode provides the best performance, particularly for small-size modesets.}
+    \label{fig:S3_modesetCompare2}
+\end{figure}
+
+In \cref{fig:S3_modesetCompare2} individual damping coefficients for each modeset were derived as presented in \cref{fig:S3_dampingOfStaticModeInvestigation}. Damping values for normal modes remained the same. It can be seen that the conclusions made from \cref{fig:S3_modesetCompare1} still hold, with some new observations:
+\begin{itemize}
+    \item After the modeset is augmented with 5 or more normal modes, no meaningful difference is observed between AM and FRM groups.
+    \item The IRM group does not seem to add any value in comparison to using only normal modes.
+    \item The Forced response mode is a valuable addition to a modeset with a small size, as was also seen in \cref{fig:S3_modesetCompare1}.
+\end{itemize}
+
+Finally, in order to further investigate the applicability of forced response mode, we can take a look at its sensitivity to the frequency by which it is defined, when it is used as the only mode in the reduction basis. 
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=.99\textwidth]{Figure_SensitivityOfFRMToFrequency_20260313_142612.pdf}
+    \caption[Sensitivity of Forced Response Mode to Frequency]{The error of the forced response mode as the only mode in the reduction basis, with respect to its defined frequency. Even  small inaccuracies in the defining frequency of the Forced Response Mode can lead to significant increase in error.}
+    \label{fig:S3_SensitivityOfFRMToFrequency}
+\end{figure}
+
+As it can be observed in \cref{fig:S3_SensitivityOfFRMToFrequency}, the forced response mode is highly sensitive to frequency as high levels of error are observed even with 1 Hz inaccuracy. Due to the high sensitivity, it should be defined exactly at the same frequency as that of the input force. 
+
+\subsection{Concluding remarks}
+\label{sec:S3_concludingRemarks}
+
+In this article the applicability of the forced response mode as a reduction mode to represent the steady state vibrations of a harmonically excited structure was investigated. Initially, the basic ideas and equations leading to the forced response mode were provided. Afterwards, an instrumented experimental setup along with its representative finite element model with a high number of \glspl{dof} was introduced, providing the model and measurement matrices used in performing forward simulations and obtaining responses. Following that, after the introduction of a baseline, four groups of reduction bases were compared. Finally the sensitivity of the forced response mode to its frequency was investigated. 
+
+The forced response mode was found to be highly effective in reduction of error in small reduction modesets, but also sensitive to the frequency by which it is defined. Nevertheless, for specific applications such as structural setups excited by shakers in lab environments, a reduction basis utilizing only the forced response mode can be time-saving and sufficiently accurate. It was shown that it would be misleading to make an a-priori assumption on damping coefficients of non-normal modes (not only the forced response mode but also the attachment and inertia relief modes), especially in small modesets, and the method of comparing the responses of the reduced model with those of a baseline model was proposed as a solution leading to damping coefficients. These damping coefficients were found to be crucial for the accuracy of the model, especially in small modesets as the residualized frequency of these modes after orthonormalization of the modeset can be close to the harmonics of the excitation.
+
+It was observed that certain levels of reduced model accuracy cannot be reached without the usage of large modesets augmented with normal modes. With regards to damping coefficients, for modesets which contained frequencies close to harmonics of the excitation (50Hz) \todo{siunix} , a high difference was observed between the error of models with initial and corrected damping coefficients. This does not necessarily mean that the model was more accurate for other modesets. In fact, the input-output relationship of the model can show a negligible error, while the damping coefficients assigned to modes which are not excited can be inaccurate. 
+
+This research is a step towards input force estimation, and the methods discussed in this article on generation of minimal bases, in combination with sensor selection algorithms and high fidelity finite element models will be used to that aim. In the next steps, the use of \gls{pod} as an additional method for generation of minimal bases will be investigated. Furthermore, experimentally generated signals will be used for assessment of the quality of the reduced bases. 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Keep the following \cleardoublepage at the end of this file, 
+% otherwise \includeonly includes empty pages.
+\cleardoublepage
+

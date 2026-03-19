@@ -1,5 +1,66 @@
 % !TeX root = ../../thesis.tex
-\chapter{This is introduction}\label{ch:introduction}
+\chapter{Introduction}\label{ch:introduction}
+
+\section{Research background and motivation}
+
+Research background:
+
+Indirect load estimation for bearings is very important, RUL of bearings could prevent catastrophic stuff from happening, cite the data related to the sweden's wind turbine failuresz, for wind turbines it could be beneficial for blahblah
+
+Direct measurement is not possible, so we have to do indirect load estimation,
+
+
+
+Many systems already have a lot of sensors placed on them, and in the development of the product, the model of the system is already developed so there's no need to develop a new model, we can use the existing model in the estimation scheme.
+
+This thesis aims to estimate the bearing loads taking advantage of the existing sensors and models.
+
+Motivation:
+\begin{itemize}
+  \item The prohibitive cost of force cells for direct load measurement or, in some cases, infeasibility of it.
+  \item The experimental complexity of placing sensors in harsh environments (e.g., on shafts inside gearboxes).
+  \item The numerical cost and complexity associated with full-scale modeling of rotating components.
+\end{itemize}
+
+
+
+\section{Problem statement and objectives}
+
+Problem statement:
+Looking at the motivation points mentioned above, the problem statement is: This research aims to enable the indirect estimation of loads in complex mechanical systems, with a specific focus on bearings. The methodology utilizes surface-mounted sensors to avoid the necessity of explicitly modeling rotating components.
+
+
+Objectives:
+Clear objectives, such as
+\begin{itemize}
+  \item Improving the modeling side, from model generation to updating to reduction etc
+  \item Improving the measurement side, measurement acuracy and measurement correlation (BC identification links to both)
+  \item For the developed methodologies to be applicable to real-world setups, such as setups with industrial level of complexity
+\end{itemize}
+
+\section{Contributions and approaches}
+
+\begin{itemize}
+  \item Model reduction strategies:
+Contribution: We demonstrate the critical influence of a minimal reduction basis for load estimation and introduce a novel reduction method specifically designed for systems subject to periodic excitations.
+Approach: We investigate the observability of the reduced system as a function of the number of states. The reduction basis is analytically derived from fundamental equations based on assumed loading conditions. We then evaluate the performance of this novel reduction mode numerically, specifically quantifying the accuracy relative to the precision of the detected frequency.
+Model updating and sensor placement:
+ \item Model updating and sensor placement:
+Contribution: We establish a systematic framework for representative model building and updating. This enables the precise identification of boundary conditions and guides sensor placement to maximize the Signal-to-Noise Ratio (SNR), thereby improving estimation performance from both modeling and measurement perspectives.
+Approach: Starting from discretized equations of motion, we demonstrate that this framework minimizes uncertainty at each stage. The validity of the boundary condition identification method is subsequently verified through numerical examples.
+  \item Experimental Fidelity (Cables \& Damping):
+Contribution: We highlight the significant impact of sensors and their cabling on experimental data quality—particularly regarding damping parameters—and propose simplified models to accurately account for or compensate for these influences.
+Approach: Using Laser Doppler Vibrometers (LDV) for non-contact validation, we experimentally isolate the influence of accelerometers and their cables. We then propose and validate a simple lumped-parameter model to compensate for these mass and damping effects.
+  \item Industrial Validation:
+Contribution: We apply the model generation framework and load estimation methodology to a setup of industrial complexity, providing experimental validation for the bearing load estimation procedure.
+Approach: By implementing the full framework—including model updating and boundary condition identification—we enable sensor correlation at high-SNR locations near boundaries. This allows for the accurate estimation of the lumped bearing load over a wide frequency range.
+\end{itemize}
+
+
+
+\section{Outline of the dissertation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \instructionsintroduction
 
@@ -17,13 +78,24 @@ Illustration of how to include citations \cite{Meert2011PhD} and \cite{VandenBro
 
 And yet another citation \cite{FrRo2010Diffusion}.
 
-% Some dummy code to get at least 1 entry in the nomenclature.
-\nomenclature{$\Theta$}{A nice symbol}
-Introducing some symbol: $\Theta$.
+% Some dummy code to get at least 1 entry in the symbols.
+
+
+Introducing some symbol: \(\angtheta\) .
+
+\begin{align}
+  \theta = \int_0^{2\pi} \sin(\theta) d\theta \\
+  \theta^2 + \theta_i - \theta_{i-1} = 0 \\
+  \theta_i^2 \\
+  \theta2 \\
+  \angtheta = \int_0^{2\pi} \sin(\angtheta) d\angtheta \\
+  \angtheta^2 + \angtheta_i - \angtheta_{i-1} = 0 \\
+  \angtheta_i^2 \\
+  \angtheta2 
+\end{align}
 
 % Some dummy code to get at least 1 entry in the list of
 % abbreviations.
-\newglossaryentry{md}{name={MD},description={molecular dynamics}}
 Introducing an acronym: \gls{md}.
 
 % Some dummy code show how to include images.

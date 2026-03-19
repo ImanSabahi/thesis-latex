@@ -1,0 +1,222 @@
+%% Treat subscripts as labels, not variables
+
+\newcommand{\angtheta}{\theta} %In the manual, needs to be removed later
+\newglossaryentry{theta}{type=symbols,
+  name={\ensuremath{\angtheta}},
+  description={A nice symbol}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% sets
+\newcommand{\realSet}{\mathbb{R}}
+\newglossaryentry{realSet}{type=symbols,
+  name={\ensuremath{\realSet}},
+  description={Set of real numbers}
+}
+
+\newcommand{\complexSet}{\mathbb{C}}
+\newglossaryentry{complexSet}{type=symbols,
+  name={\ensuremath{\complexSet}},
+  description={Set of complex numbers}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Transformations and operators
+\newcommand{\fourierTransform}{\xLeftrightarrow{\mathcal{F}}}
+\newglossaryentry{fourierTransform}{type=symbols,
+  name={\ensuremath{\bullet\fourierTransform\bullet}},
+  description={Fourier transform pair}
+}
+
+\newcommand*\diag[1]{\mathrm{diag}\left(#1\right)} %%% To allow for input of a vector or a matrix, and to ensure that the output is in the correct format (i.e., with parentheses around the input)
+\newglossaryentry{diag}{type=symbols,
+  name={\ensuremath{\diag{\bullet}}},
+  description={Diagonal operator, which creates a diagonal matrix from a vector or visa versa}
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% scalars (In the text, for representing a vector containing scalars as defined above, I'm using \bm{scalar})
+\newcommand{\damping}{\zeta}
+\newglossaryentry{damping}{type=symbols,
+  name={\ensuremath{\damping}},
+  description={Damping ratio}
+}
+
+\newcommand{\numStates}{n}
+\newglossaryentry{numStates}{type=symbols,
+  name={\ensuremath{\numStates}},
+  description={Number of states}
+}
+
+\newcommand{\numRedStates}{n_{\mathrm{r}}}
+\newglossaryentry{numRedStates}{type=symbols,
+  name={\ensuremath{\numRedStates}},
+  description={Number of reduced states}
+}
+
+\newcommand{\numInputLoads}{n_{\mathrm{f}}}
+\newglossaryentry{numInputLoads}{type=symbols,
+  name={\ensuremath{\numInputLoads}},
+  description={Number of input loads}
+}
+
+\newcommand{\freq}{\omega}
+\newglossaryentry{freq}{type=symbols,
+  name={\ensuremath{\freq}},
+  description={Frequency}
+}
+
+
+\newcommand*\naturalFreq[1][]{\omega_{\mathrm{n}#1}} %%% To allow for subscripts if needed
+\newglossaryentry{naturalFreq}{type=symbols,
+  name={\ensuremath{\naturalFreq}},
+  description={Natural frequency}
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% matrices
+\newcommand{\massMat}{\mathbf{M}}
+\newglossaryentry{massMat}{type=symbols,
+  name={\ensuremath{\massMat}},
+  description={Mass matrix}
+}
+
+\newcommand{\stiffMat}{\mathbf{K}}
+\newglossaryentry{stiffMat}{type=symbols,
+  name={\ensuremath{\stiffMat}},
+  description={Stiffness matrix}
+}
+
+\newcommand{\dampingMat}{\mathbf{C}}
+\newglossaryentry{dampingMat}{type=symbols,
+  name={\ensuremath{\dampingMat}},
+  description={Damping matrix}
+}
+
+\newcommand{\reductionMat}{\mathbf{\Psi}}
+\newglossaryentry{reductionMat}{type=symbols,
+  name={\ensuremath{\reductionMat}},
+  description={Reduction matrix}
+}
+
+\newcommand{\massMatRed}{\mathbf{M}_{\mathrm{r}}}
+\newglossaryentry{massMatRed}{type=symbols,
+  name={\ensuremath{\massMatRed}},
+  description={Reduced mass matrix}
+}
+
+\newcommand{\stiffMatRed}{\mathbf{K}_{\mathrm{r}}}
+\newglossaryentry{stiffMatRed}{type=symbols,
+  name={\ensuremath{\stiffMatRed}},
+  description={Reduced stiffness matrix}
+}
+
+\newcommand*\dampingMatRed[1][]{\mathbf{C}_{\mathrm{r}#1}} %%% To allow for subscripts if needed
+\newglossaryentry{dampingMatRed}{type=symbols,
+  name={\ensuremath{\dampingMatRed}},
+  description={Reduced damping matrix}
+}
+
+\newcommand{\selectionMat}{\mathbf{S}}   %%% Maybe not explicitly used in the text, as I'm creating individual selection matrices 
+\newglossaryentry{selectionMat}{type=symbols,
+  name={\ensuremath{\selectionMat}},
+  description={Selection matrix}
+}
+
+\newcommand{\selectionMatForce}{\mathbf{S}_{\mathrm{f}}}  %%%
+\newglossaryentry{selectionMatForce}{type=symbols,
+  name={\ensuremath{\selectionMatForce}},
+  description={Selection matrix for forces}
+}
+
+\newcommand{\selectionMatForceRed}{\mathbf{S}_{\mathrm{fr}}}  %%%
+\newglossaryentry{selectionMatForceRed}{type=symbols,
+  name={\ensuremath{\selectionMatForceRed}},
+  description={Selection matrix for reduced forces}
+}
+
+\newcommand{\TransferFunc}{\bm{\mathcal{H}}}
+\newglossaryentry{TransferFunc}{type=symbols,
+  name={\ensuremath{\TransferFunc}},
+  description={Transfer function}
+}
+
+\newcommand*\massMatAug[1][]{\mathbf{M}_{\mathrm{aug}#1}} %%% ICEM: Augmented mass matrix, including the point masses for the accelerometers and their cables
+\newglossaryentry{massMatAug}{type=symbols,
+  name={\ensuremath{\massMatAug}},
+  description={Augmented mass matrix including only the point masses}
+}
+
+\newcommand*\dampingMatAug[1][]{\mathbf{C}_{\mathrm{aug}#1}} %%% ICEM: Augmented damping matrix, including the point dampers for the accelerometers and their cables
+\newglossaryentry{dampingMatAug}{type=symbols,
+  name={\ensuremath{\dampingMatAug}},
+  description={Augmented damping matrix including only the point dampers}
+}
+
+\newcommand{\stateMatCont}{\mathbf{A}_{\mathrm{c}}}
+\newglossaryentry{stateMatCont}{type=symbols,
+  name={\ensuremath{\stateMatCont}},
+  description={Continuous state matrix}
+}
+
+\newcommand{\inputMatCont}{\mathbf{B}_{\mathrm{c}}}
+\newglossaryentry{inputMatCont}{type=symbols,
+  name={\ensuremath{\inputMatCont}},
+  description={Continuous input matrix}
+}
+
+\newcommand{\stateMatDisc}{\mathbf{A}_{\mathrm{d}}}
+\newglossaryentry{stateMatDisc}{type=symbols,
+  name={\ensuremath{\stateMatDisc}},
+  description={Discrete state matrix}
+}
+
+\newcommand{\inputMatDisc}{\mathbf{B}_{\mathrm{d}}}
+\newglossaryentry{inputMatDisc}{type=symbols,
+  name={\ensuremath{\inputMatDisc}},
+  description={Discrete input matrix}
+}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% vectors (In the text, for representing a vector containing scalars as defined above, I'm using \bm{scalar})
+\newcommand{\forceVec}{\mathbf{f}}
+\newglossaryentry{forceVec}{type=symbols,
+  name={\ensuremath{\forceVec}},
+  description={Force vector}
+}
+
+\newcommand{\forceVecFreq}{\mathbf{F}}
+\newglossaryentry{forceVecFreq}{type=symbols,
+  name={\ensuremath{\forceVecFreq}},
+  description={Force vector in frequency domain}
+}
+
+\newcommand{\displacementVec}{\mathbf{u}}
+\newglossaryentry{displacementVec}{type=symbols,
+  name={\ensuremath{\displacementVec}},
+  description={Displacement vector}
+}
+
+\newcommand{\genDispVec}{\mathbf{q}}
+\newglossaryentry{genDispVec}{type=symbols,
+  name={\ensuremath{\genDispVec}},
+  description={Generalized displacement vector}
+}
+
+\newcommand{\genDispVecFreq}{\mathbf{Q}}
+\newglossaryentry{genDispVecFreq}{type=symbols,
+  name={\ensuremath{\genDispVecFreq}},
+  description={Generalized displacement vector in frequency domain}
+}
+
+\newcommand{\stateVec}{\mathbf{x}}
+\newglossaryentry{stateVec}{type=symbols,
+  name={\ensuremath{\stateVec}},
+  description={State vector}
+}
+
+\newcommand{\outputVec}{\mathbf{y}}
+\newglossaryentry{outputVec}{type=symbols,
+  name={\ensuremath{\outputVec}},
+  description={Output vector}
+}
+
